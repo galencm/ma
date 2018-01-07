@@ -1,0 +1,46 @@
+Route:
+    route_rules*=RouteRule
+;
+
+RouteRule:
+  IfDoRule | IfWhenRule
+;
+
+Comparator:
+(comparator_value=FLOAT comparator_symbol=ComparatorSymbol)#
+;
+
+IfDoRule:
+route_name=RouteName? 'if' left_compare=Comparator? channel=STRING right_compare=Comparator? 'do' action=ID (args*=Arg[' ' eolterm])? 
+;
+
+RouteName:
+'route' route=STRING
+;
+
+S:
+'+'|'-'
+;
+
+IfWhenRule:
+route_name=RouteName? 'whenever' subchannel=STRING 'with' subpattern=ID 'pipeto' pipe=ID (args*=Arg[' ' eolterm])? 
+;
+
+SubChannelName:
+name = /[^,]*/
+;
+
+ComparatorSymbol:
+symbol = /[<>]=?|=/
+;
+
+Arg:
+    arg=Value | arg=Value
+;
+Substitution:
+'{' sub=STRING '}'
+;
+Value:
+    STRING | FLOAT | INT | ID | Substitution
+;
+

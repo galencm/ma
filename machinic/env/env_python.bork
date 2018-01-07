@@ -1,0 +1,11 @@
+#!/bin/bash
+ok pip3 zerorpc
+ok pip3 paho.mqtt
+ok pip3 python-consul
+ok pip3 cmd2
+ok pip3 redis
+ok pip3 logzero
+ok pip3 textx
+ok pip3 ruamel
+ok pip3 Jinja2
+ok pip3 attrs

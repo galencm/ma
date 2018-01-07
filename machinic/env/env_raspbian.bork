@@ -1,0 +1,9 @@
+#!/bin/bash
+#consul systemd service?
+#nomad systemd service?
+
+#https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_arm.zip
+#arm64
+#https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_arm64.zip
+#https://releases.hashicorp.com/nomad/0.7.0/nomad_0.7.0_linux_arm.zip
+#https://releases.hashicorp.com/nomad/0.7.0/nomad_0.7.0_linux_arm64.zip

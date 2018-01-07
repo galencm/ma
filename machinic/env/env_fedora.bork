@@ -1,0 +1,52 @@
+#!/bin/bash
+#consul systemd service?
+#nomad systemd service?
+#https://github.com/antirez/neural-redis
+
+#/etc/systemd/system/
+
+
+which redis
+#0: found 1:not found
+available=$?
+if [[ $available == 1 ]]
+    then
+    echo redis not found installing 
+    wget -P /tmp http://download.redis.io/releases/redis-4.0.2.tar.gz
+    (cd /tmp ; tar xvf /tmp/redis-4.0.2.tar.gz )
+    #installs to /usr/local/bin
+    (cd /tmp/redis-4.0.2/ ; make ; sudo make install)
+fi
+if [[ $available == 0 ]]
+    echo redis found 
+fi
+
+which consul
+#0: found 1:not found
+available=$?
+if [[ $available == 1 ]]
+    then
+    echo consul not found installing 
+    wget -P /tmp https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_amd64.zip
+    #unzips a binary /tmp/consul
+    unzip /tmp/consul_1.0.1_linux_amd64.zip -d /tmp
+    (cd /tmp ; sudo cp consul /usr/local/bin)
+fi
+if [[ $available == 0 ]]
+    echo consul found 
+fi
+
+which nomad
+#0: found 1:not found
+available=$?
+if [[ $available == 1 ]]
+    then
+    echo nomad not found installing 
+    wget -P /tmp https://releases.hashicorp.com/nomad/0.7.0/nomad_0.7.0_linux_amd64.zip
+    unzip /tmp/nomad_0.7.0_linux_amd64.zip -d /tmp
+    (cd /tmp ; sudo cp nomad /usr/local/bin)
+
+fi
+if [[ $available == 0 ]]
+    echo nomad found 
+fi

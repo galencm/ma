@@ -1,0 +1,31 @@
+Pipe:
+'pipe' name=ID
+  '{' 
+    pipe_steps*=PipeStep
+  '}'
+;
+
+PipeStep:
+  Step
+;
+
+Step:
+    (annotation*=Annotation[' '] ':')? call=ID (args*=Arg[' ' eolterm])? 
+;
+
+Annotation:
+annotation=ID
+;
+
+Arg:
+    arg=Value | arg=Value
+;
+
+Value:
+    STRING | FLOAT | INT | ID 
+;
+
+
+Comment:
+  /\/\/.*$/
+;

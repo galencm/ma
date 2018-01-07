@@ -1,0 +1,40 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright (c) 2017, Galen Curwen-McAdams
+
+import consul
+import redis
+import sys
+import argparse
+
+def lookup(service):
+    c = consul.Consul()
+    services = {k:v for (k,v) in c.agent.services().items() if k.startswith("_nomad")}
+    for k in services.keys():
+        if services[k]['Service'] == service:
+                service_ip,service_port = services[k]['Address'],services[k]['Port']
+                return service_ip,service_port
+                break
+    return None,None
+    
+redis_ip,redis_port = lookup('redis')
+r = redis.StrictRedis(host=redis_ip, port=str(redis_port),decode_responses=True)
+
+
+def main(argv):
+    """
+    """
+    parser = argparse.ArgumentParser(description=main.__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("action", help="set", choices=['set'])
+    parser.add_argument("state", help="")
+    parser.add_argument("key", help="")
+    parser.add_argument("value", help="")
+    args = parser.parse_args()
+    if args.action == "set":
+        r.hmset("state:{}".format(args.state),{args.key:args.value})
+
+
+if __name__ == "__main__":
+    main(sys.argv)

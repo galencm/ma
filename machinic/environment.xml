@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<environment name="machinic">
+    <!-- os packages
+    <include name="thing" system="dnf" />
+    <include name="thing" system="apt" />
+    -->
+    <!-- python packages -->
+    <include name="zerorpc" system="python3"/>
+    <include name="paho.mqtt" system="python3" />
+    <include name="python-consul" system="python3" />
+    <include name="cmd2" system="python3" />
+    <include name="redis" system="python3" />
+    <include name="logzero" system="python3" />
+    <include name="textX" system="python3" />
+    <include name="ruamel" system="python3" />
+    <include name="Jinja2" system="python3" />
+    <include name="attrs" system="python3" />
+
+    <!-- linux_x86_64 
+        x86_64 
+        linux_amd64 
+        linux_arm
+    -->
+    <!-- dl and install -->
+    <include name="redis-server"
+            system="linux_amd64"
+            url="http://download.redis.io/releases/redis-4.0.2.tar.gz"
+            command="make install"
+            
+            />
+    <include name="redis-server"
+            system="linux_arm"
+            url="http://download.redis.io/releases/redis-4.0.2.tar.gz"
+            command="make install"
+            />
+    <include name="consul"
+            system="linux_amd64"
+            url="https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_amd64.zip"
+            command="copy install nodir"
+            file="consul"
+            />
+    <include name="nomad"
+            system="linux_amd64"
+            url="https://releases.hashicorp.com/nomad/0.7.0/nomad_0.7.0_linux_amd64.zip"
+            command="copy install nodir"
+            file="nomad"
+        />
+    <include name="consul"
+            system="linux_arm"
+            url="https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_arm.zip"
+            command="copy install nodir"
+            file="consul"
+            />
+    <include name="nomad"
+            system="linux_arm"
+            url="https://releases.hashicorp.com/nomad/0.7.0/nomad_0.7.0_linux_arm.zip"
+            command="copy install nodir"
+            file="nomad"
+        />
+
+    <!-- append files with something like 
+        include system="raw" -->
+</environment>

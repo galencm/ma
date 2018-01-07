@@ -1,0 +1,15 @@
+[Unit]
+Description=generic template for consul
+After=multi-user.target
+
+[Service]
+Type=simple
+
+ExecStart=/bin/sh -c "consul agent -server  -bootstrap-expect=1 -data-dir=/tmp -bind='{{ GetInterfaceIP \"enp0s25\" }}'"
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+StandardOutput=journal
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
