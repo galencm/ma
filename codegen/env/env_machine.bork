@@ -1,0 +1,28 @@
+#!/bin/bash
+#generic wrapper script that runs scripts
+#based on os/architecture
+#for now support: fedora, debian,raspbian
+
+OS_NAME=$( grep -o '^ID=[^, }]*' /etc/os-release )
+OS_NAME="${OS_NAME/ID=/}"
+echo $OS_NAME
+echo $OS_TYPE
+
+#run for any
+include env_python.bork
+
+#os specific
+case $OS_NAME in
+   fedora*)
+    include env_fedora.bork 
+    ;;
+   debian*)
+    include env_debian.bork 
+    ;;
+   ubuntu*)
+    include env_debian.bork 
+    ;;
+   raspbian*)
+    include env_debian.bork 
+    ;;        
+esac

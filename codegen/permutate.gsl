@@ -1,0 +1,38 @@
+.- This Source Code Form is subject to the terms of the Mozilla Public
+.- License, v. 2.0. If a copy of the MPL was not distributed with this
+.- file, You can obtain one at http://mozilla.org/MPL/2.0/.
+.- 
+.- Copyright (c) 2017, Galen Curwen-McAdams
+
+. if switches.arg1 ?<> ""
+. define output_path = switches.arg1
+. else
+. define output_path = "./machine/"
+. endif
+
+. if switches.arg2 ?<> ""
+. define template_dir = switches.arg2
+. else
+. define template_dir = "."
+. endif
+. echo output_path
+
+
+. dir = directory.create(output_path) ?
+
+. define I = 0
+. dir = directory.open (template_dir)
+. for peripheral
+. echo peripheral.type
+. for dir.file as f
+. if regexp.match('^$(type).*gsl$',f.name) 
+. echo template_dir+"/"+f.name
+.- gsl from "$(f.name)"
+
+. gsl from template_dir+"/"+"$(f.name)"
+. endif
+. endfor
+. I += 1
+. endfor
+
+

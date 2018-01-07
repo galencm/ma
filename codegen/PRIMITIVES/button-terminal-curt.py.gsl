@@ -1,0 +1,54 @@
+.output "$(output_path)$(peripheral.type)-term-curt-$(I).py"
+
+#!/usr/bin/python3
+import paho.mqtt.client as mosquitto 
+import sys
+import time
+from curtsies import Input
+
+import consul
+import zerorpc
+
+def lookup(service):
+    c = consul.Consul()
+    services = {k:v for (k,v) in c.agent.services().items() if k.startswith("_nomad")}
+    for k in services.keys():
+        if services[k]['Service'] == service:
+                service_ip,service_port = services[k]['Address'],services[k]['Port']
+                return service_ip,service_port
+                break
+    return None,None
+
+
+mqtt_ip,mqtt_port = lookup('mqtt')
+cli = mosquitto.Client()
+cli.connect(mqtt_ip, mqtt_port, 60)
+cli.loop_start()
+
+print("Keybindings:")
+print(" '$(peripheral.alternative_press)':")
+. for peripheral.output
+print("    $(output.value) to $(output.destination:)")
+. endfor
+print("Press ESC or Ctrl-d to exit")
+print("")
+print("waiting for input...")
+with Input(keynames='curtsies') as input_generator:
+    for e in Input():
+        if e in (u'<ESC>', u'<Ctrl-d>'):
+            break
+        elif e == '$(peripheral.alternative_press)':
+            print("{} pressed".format(e))
+.- echo peripheral.type
+. for peripheral.output
+.- echo output.destination
+            cli.publish('$(output.destination:)','$(output.value)')
+            time.sleep(0.01)
+. endfor
+
+        else:
+            #print(e)
+            pass
+
+
+

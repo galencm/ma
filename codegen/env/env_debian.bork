@@ -1,0 +1,20 @@
+#!/bin/bash
+#platformio
+#imatix gsl
+which gsl
+#0: found 1:not found
+available=$?
+if [[ $available == 1 ]]
+    then
+    echo gsl not found installing 
+    wget -P /tmp https://github.com/imatix/gsl/archive/master.zip
+    unzip /tmp/master.zip -d /tmp
+    cd /tmp/gsl-master/src
+    make
+    #installs to /usr/local/bin
+    sudo make install
+fi
+if [[ $available == 0 ]]
+    echo gsl found 
+fi
+
