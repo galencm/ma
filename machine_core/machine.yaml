@@ -1,0 +1,44 @@
+
+description:
+    core machine
+
+aliases:
+  scanning_interface: &scan_iface wlp0s29f7u2
+  accesspoint_interface: &ap_iface wlp0s26f7u1
+  accesspoint_password: &ap_pass f00_bar_baz
+  accesspoint_ssid: &ap_ssid foo
+
+includes:
+ - bridge.py:
+    duplicates: False
+    rpc: False
+    name: bridge
+    args: [bridge]
+ - bridge.py:
+    rpc: False
+    name: bridge-watch
+    args: [reactor]
+ - tools.py:
+    name: tools
+ - redis.hcl:
+ - mqtt.hcl:
+ - associative.py:
+    connect_args: False
+    rpc: False
+    args: [*scan_iface,--config,default.yaml,--ap-ssid,*ap_ssid,--ap-pass,*ap_pass]
+ - create-ap:
+    connect_args: False
+    rpc: False
+    location: path
+    args: [*ap_iface,-n,*ap_ssid,*ap_pass,--no-virt]
+
+routes:
+
+pipes:
+ - >
+
+rules:
+
+prepare:
+
+set:

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<machine>
+<environment name="machine_core">
+    <!-- os packages     
+    <include name="foo" system="dnf" />
+    <include name="foo" system="apt" />
+    -->
+
+    <!-- python packages -->
+    <!-- alphabetical would be useful -->
+    <include name="redis" system="python3"/>
+    <include name="attrs" system="python3" />
+    <include name="logzero" system="python3" />
+    <include name="redis" system="python3" />
+    <include name="python-consul" system="python3" />
+    <include name="zerorpc" system="python3" />
+    <include name="Jinja2" system="python3" />
+    <include name="textX" system="python3" />
+    <include name="paho.mqtt" system="python3" />
+    <include name="netifaces" system="python3" />
+
+    <!-- linux_x86_64 
+        x86_64 
+        linux_amd64 
+        linux_arm
+    -->
+    <!-- dl and install -->
+    <include name="create_ap"
+            system="linux_amd64"
+            url="https://github.com/oblique/create_ap/archive/master.zip"
+            expanded_directory="create_ap-master"
+            command="make install"
+            />
+    <include name="create_ap"
+            system="linux_arm"
+            url="https://github.com/oblique/create_ap/archive/master.zip"
+            expanded_directory="create_ap-master"
+            command="make install"
+            />
+    <include name="redis-server"
+            system="linux_amd64"
+            url="http://download.redis.io/releases/redis-4.0.6.tar.gz"
+            command="make install"
+            />
+    <include name="redis-server"
+            system="linux_arm"
+            url="http://download.redis.io/releases/redis-4.0.6.tar.gz"
+            command="make install"
+            />
+</environment>
+</machine>

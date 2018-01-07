@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<machine description="core machine" version="0.001">
+    <alias name="scanning_interface" alias="scan_iface" value="wlp0s29f7u2"/>
+    <alias name="accesspoint_interface" alias="ap_iface" value="wlp0s26f7u1"/>
+    <alias name="accesspoint_password" alias="ap_pass" value="f00_bar_baz"/>
+    <alias name="accesspoint_ssid" alias="ap_ssid" value="foo"/>
+
+    <include file="bridge.py" name="bridge" duplicates="false" rpc="false">
+        <ignore_check>gphoto2</ignore_check>
+        <argument>bridge</argument>
+    </include>
+    <include file="bridge.py" name="bridge-watch" rpc="false">
+        <argument>reactor</argument>
+    </include>
+    <include file="tools.py" name="tools" />
+    <include file="redis.hcl"/>
+    <include file="mqtt.hcl"/>
+    <include file="associative.py" connect_args="false"
+      rpc="false">
+        <argument alias="scan_iface"/>
+        <argument>--config</argument>
+        <argument>default.yaml</argument>
+        <argument>--ap-ssid</argument>
+        <argument alias="ap_ssid"/>
+        <argument>--ap-pass</argument>
+        <argument alias="ap_pass"/>
+    </include>
+    <include file="create-ap" rpc="false" connect_args="false" location="path">
+        <argument alias="ap_iface" />
+        <argument>-n</argument>
+        <argument alias="ap_ssid"/>
+        <argument alias="ap_pass"/>
+        <argument>--no-virt</argument>
+    </include>
+</machine>
