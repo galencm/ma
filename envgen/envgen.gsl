@@ -1,0 +1,36 @@
+.- This Source Code Form is subject to the terms of the Mozilla Public
+.- License, v. 2.0. If a copy of the MPL was not distributed with this
+.- file, You can obtain one at http://mozilla.org/MPL/2.0/.
+.- 
+.- Copyright (c) 2017, Galen Curwen-McAdams
+
+. if switches.arg1 ?<> ""
+. define output_path = switches.arg1
+. else
+. define output_path = "./env/"
+. endif
+
+. if switches.arg2 ?<> ""
+. define template_dir = switches.arg2
+. else
+. define template_dir = "./ENVS"
+. endif
+. echo output_path
+
+
+. dir = directory.create(output_path) ?
+.- echo file.copy('env_machine.bork',output_path+'env_machine.bork')
+
+. dir = directory.open (template_dir)
+. for dir.file as f
+
+. echo f.name
+. echo "$(output_path)env_os_debian.bork"
+. gsl from template_dir+"/"+"$(f.name)"
+.- some sort of xml file per os?
+.- if regexp.match("_os_",f.name)
+.- gsl from "foo.gsl"
+.-endif
+. endfor
+
+
