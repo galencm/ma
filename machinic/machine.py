@@ -302,18 +302,6 @@ def generate_control_scripts(path,files,states,machine_name):
         except Exception as ex:
             logger.warn("could not check shebang for {}".format(f))
             logger.warn(ex)
-def snapshot_to_machine(name):
-    #machine.py snapshot --name new_machine
-        #get running jobs from nomad
-    #jobs
-    #routes
-    routes = routeling.get_routes("*")
-    #pipes
-    pipes = pipeling.get_pipes("*")
-
-    #rules
-    #write file....
-    print(routes,pipes)
 
 def named(args,required):
     for r in required:
@@ -328,7 +316,7 @@ def main(argv):
 
     """
     parser = argparse.ArgumentParser(description=main.__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("action", help="run|status|snapshot", choices=['run','status','snapshot'])
+    parser.add_argument("action", help="run|status", choices=['run','status'])
     parser.add_argument("--name",required=named(argv,['run','stop','help']) , help="machine name")
     parser.add_argument("--path",required=named(argv,['run','stop','help']), help="machine file path",default=None)
     args = parser.parse_args()
@@ -338,8 +326,6 @@ def main(argv):
         start_machine(args.name,pre_clear,args.path)
     elif args.action == 'status':
         status()
-    elif args.action == 'snapshot':
-        snapshot_to_machine(args.name)
 
 if __name__ == "__main__":
     main(sys.argv)
