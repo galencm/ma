@@ -59,7 +59,7 @@ def list_to_file(name,list_name,path,list_items):
         for r in list_items:
             f.write("{}\n".format(r))
 
-def start_machine(name,clear_before_start,machine_file='machine.yaml'):
+def start_machine(name,clear_before_start,machine_file):
 
     if os.path.isdir(name):
         if os.path.isfile(os.path.join(name,machine_file)):
@@ -312,18 +312,18 @@ def named(args,required):
 def main(argv):
     """
     example:
-        python3 machine.py run --name foo --path ../machine_foo/machine.yaml
+        python3 machine.py run --name foo --file ../machine_foo/machine.yaml
 
     """
     parser = argparse.ArgumentParser(description=main.__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("action", help="run|status", choices=['run','status'])
     parser.add_argument("--name",required=named(argv,['run','stop','help']) , help="machine name")
-    parser.add_argument("--path",required=named(argv,['run','stop','help']), help="machine file path",default=None)
+    parser.add_argument("--file",required=named(argv,['run','stop','help']), help="machine file",default=None)
     args = parser.parse_args()
     pre_clear = False
 
     if args.action == 'run':
-        start_machine(args.name,pre_clear,args.path)
+        start_machine(args.name,pre_clear,args.file)
     elif args.action == 'status':
         status()
 
