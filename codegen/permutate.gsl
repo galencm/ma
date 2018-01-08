@@ -4,19 +4,16 @@
 .- 
 .- Copyright (c) 2017, Galen Curwen-McAdams
 
-. if switches.arg1 ?<> ""
+. if switches.arg1 <> ""
+. abort "argument 1 output path required\nUsage:\ngsl -a -script:permutate.gsl [xml] [output_path] [template_directory]"
+. endif
+
+. if switches.arg2 = ""
+. abort "argument 2 template directory required\nUsage:\ngsl -a -script:permutate.gsl [xml] [output_path] [template_directory]"
+. endif
+
 . define output_path = switches.arg1
-. else
-. define output_path = "./machine/"
-. endif
-
-. if switches.arg2 ?<> ""
 . define template_dir = switches.arg2
-. else
-. define template_dir = "."
-. endif
-. echo output_path
-
 
 . dir = directory.create(output_path) ?
 
