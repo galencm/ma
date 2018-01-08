@@ -16,7 +16,7 @@ done
 
 usage="Usage:  $0 [xml] [dir]
         xml     path to xml file
-        dir     (default: './env')  destination for generated /env
+        dir     destination for generated /env
         
         -o      list output Sources
         -h      help
@@ -25,17 +25,12 @@ Use an xml file to    1) generate environment scripts for machine or project
 
 Generated files are stored in created directory structure.
 For example:
-    ./envgen.sh ../machine_foo/environment.xml ../machine_foo/
+    ./envgen.sh ~/machine_foo/environment.xml ~/machine_foo/
 produces the output:
-                       ../machine_foo/env/
-                       ../machine_foo/env/<files>
+                       ~/machine_foo/env/
+                       ~/machine_foo/env/<files>
 
                        ('/env/' directory is automatically appended)
-Or:
-    ./envgen.sh foo.xml
-produces the output:
-                      ./env
-                      ./env/<files>
 
 Output Sources:
   ./ENVS/ contains GSL templates used to generate code.
@@ -52,7 +47,6 @@ Output Sources:
 : ${1?"$usage"}
 #if run without second argument use './env/'
 #as default
-outdir=${2:-./env/}
 
 while getopts ':ohs:' option; do
   case "$option" in
@@ -66,6 +60,9 @@ while getopts ':ohs:' option; do
 
 done
 shift $((OPTIND - 1))
+
+: ${2?$(echo missing output directory)$(exit 1)}
+outdir=$2
 
 #append trailing / if needed...
 case "$outdir" in
