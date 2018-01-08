@@ -4,7 +4,7 @@
 .- 
 .- Copyright (c) 2017, Galen Curwen-McAdams
 
-. if switches.arg1 <> ""
+. if switches.arg1 = ""
 . abort "argument 1 output path required\nUsage:\ngsl -a -script:permutate.gsl [xml] [output_path] [template_directory]"
 . endif
 
