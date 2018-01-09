@@ -13,8 +13,6 @@ import pathlib
 import textwrap
 import jinja2
 import glob
-#env var for nomad path?
-import local_tools
 import uuid
 from logzero import logger
 #external .hcl files do not take tags
