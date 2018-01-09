@@ -31,10 +31,10 @@ def nomad_address():
         # running nomad server in dev mode
         # uses a uuid suffix rather than -http
         # try to match port
-        for k,v in c.agent.services():
+        for k,v in c.agent.services().items():
             if v['Port'] == 4646:
                 nomad_details = v
-                return
+                break
 
     nomad_port = nomad_details['Port']
     nomad_ip = nomad_details['Address']
