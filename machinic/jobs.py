@@ -190,7 +190,7 @@ def run_job(name,command,args,path=".jobs",tags=None,verbose=False,nomad_locatio
     job_hcl = jinja2.Environment().from_string(job_template).render(config)
     
     #do not overwrite if using external kwarg
-    #in case of reload or fg
+    #in case of reload
     if not external_file:
         logger.info("writing job .hcl file: {}".format(os.path.join(path,'{}.hcl'.format(name))))
         with open(os.path.join(path,'{}.hcl'.format(name)),'w+') as f:
@@ -288,7 +288,7 @@ def main(argv):
     parser = argparse.ArgumentParser(description=main.__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser = argparse.ArgumentParser(epilog=tutorial_string,formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("action", help="stop|run|run-file|reload|status|status-raw|get|purge|fg|rerun", choices=['run','run-file','stop','reload','status','status-raw','get','purge','fg','rerun'])
+    parser.add_argument("action", help="stop|run|run-file|reload|status|status-raw|get|purge|rerun", choices=['run','run-file','stop','reload','status','status-raw','get','purge','rerun'])
     parser.add_argument("--name",required=foo(argv) , help="job name/id")
     parser.add_argument("--command",required=run_existing(argv), help="full path of command to call",default=None)
     parser.add_argument("--args", help="Args,kwargs and flags to be used by command. A string separated by space, quoted at beginning and end to avoid parsing. Example: \"--foo bar.baz --another-flag\" ",default=[])
@@ -364,52 +364,6 @@ def main(argv):
         list_services()
     elif args.action == 'get':
         get_job(args.name,path=args.jobs_path,nomad_location=args.nomad_location)
-    elif args.action == 'fg':
-        #get host and port
-        #stop nomad job
-        #run process in terminal with settings
-        #ie visible in stdout
-        #on ctrl c,restart on nomad
-        reload_file = '{}.json'.format(args.name)
-        if not os.path.isfile(reload_file):
-            parser.error('{} not found'.format(reload_file))
-        run_job(args.name,'',[],verbose=args.verbose,external_file=reload_file)
-
-        c = consul.Consul()
-        services = {k:v for (k,v) in c.agent.services().items() if k.startswith("_nomad")}
-        for k in services.keys():
-            if services[k]['Service'] == args.name:
-                    service_ip,service_port = services[k]['Address'],services[k]['Port']
-                    break
-            service_ip,service_port = None,None
-
-        service_config = None
-        with open(reload_file) as f:
-            service_config = json.load(f)
-
-        #print(service_config["Job"]["TaskGroups"][0]["Tasks"][0]["Config"])
-        config_stanza = service_config["Job"]["TaskGroups"][0]["Tasks"][0]["Config"]
-        
-        command = config_stanza["command"]
-        command_args = config_stanza["args"]
-        command_args = [s.replace('${NOMAD_IP_service_port}',service_ip) for s in command_args]
-        command_args = [s.replace('${NOMAD_PORT_service_port}',str(service_port)) for s in command_args]
-
-        stop_job(args.name,False,args.verbose,args.nomad_location)
-        try:
-            logger.info("foregrounding {}".format(args.name))
-            p = subprocess.Popen([command,*command_args])
-            #print(command_args)
-            #p = subprocess.Popen(command+' '+' '.join(command_args),shell=True)
-            p.communicate()
-
-            print(command,command_args)
-            print("done")
-        #finally:
-        #except KeyboardInterrupt:
-        #    run_job(args.name,'',[],verbose=args.verbose,external_file=reload_file)
-        finally:
-            run_job(args.name,'',[],verbose=args.verbose,external_file=reload_file)
 
 if __name__ == "__main__":
     main(sys.argv)
