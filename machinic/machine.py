@@ -76,7 +76,8 @@ def start_machine(name,clear_before_start,machine_file):
         logger.info("loaded yaml: {}".format(machine_outline))
         machine_path = os.path.dirname(machine_file)
     else:
-        logger.info("returning",machine_file)
+        logger.info("{} is not a file".format(machine_file))
+        logger.info("returning")
         return
     try:
         #import routeling
@@ -292,17 +293,19 @@ def generate_control_scripts(path,files,states,machine_name):
             st = os.stat(file)
             os.chmod(file, st.st_mode | 0o111)
         except Exception as ex:
+            logger.warn("tried to make executable: {}".format(file))
             logger.warn(ex)
 
         shebang_line = ""
         try:
-            with open(file, 'r') as f:
-                shebang_line = f.readline()
-            if "#!/usr/bin/python3" in shebang_line:
-                logger.info("shebang found")
-            else:
-                logger.warn("no shebang on first line of {}".format(file))
-                logger.warn("#!/usr/bin/python3 is not on first line. Nomad will not run file")
+            if f.endswith(".py"):
+                with open(file, 'r') as f:
+                    shebang_line = f.readline()
+                if "#!/usr/bin/python3" in shebang_line:
+                    logger.info("shebang found")
+                else:
+                    logger.warn("no shebang on first line of {}".format(file))
+                    logger.warn("#!/usr/bin/python3 is not on first line. Nomad will not run file")
         except Exception as ex:
             logger.warn("could not check shebang for {}".format(f))
             logger.warn(ex)
