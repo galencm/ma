@@ -74,7 +74,7 @@ def stop_job(name,purge=False,nomad_location=None):
 
     print(subprocess.check_output('{} stop -address=http://{}:{} {} {}'.format(nomad_location,nomad_ip,nomad_port,purge,name).split()).decode())
 
-def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=None,no_default_host_port_args=None):
+def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=None,scheduler_wireup_host_port=None):
     #pass in checks as list of textfiles with path
     args = list(filter(None, args)) 
 
@@ -99,7 +99,7 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=N
 
     config['args'] = args
     config['command'] = command
-    config['no_default_args'] = no_default_host_port_args
+    config['scheduler_wireup_host_port'] = scheduler_wireup_host_port
 
     #TODO modularize checks
     check_gphoto2 = textwrap.dedent('''
@@ -140,7 +140,7 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=N
               {% for arg in args -%}
               "{{arg}}"{{ "," }}
               {%- endfor %}
-              {% if no_default_args != true %}
+              {% if scheduler_wireup_host_port != true %}
               "--host","${NOMAD_IP_service_port}",
               "--port","${NOMAD_PORT_service_port}",
               {% endif%}
@@ -278,7 +278,7 @@ def main(argv):
     parser.add_argument("--log-level", choices=['debug','info','warn','error'],default="info",help="checks ie gphoto2")
     parser.add_argument("-j","--jobs-path", help="directory to story job output and generated files default: ~/.local/jobs" ,default=jobs_path)
     parser.add_argument("-t","--tags", help="store in tags",nargs='+',default=None)
-    parser.add_argument("--no-default-args", action='store_true',default=False)
+    parser.add_argument("--scheduler-wireup", action='store_true',default=False)
 
     #TODO tutorial string on error with no arguments
     args = parser.parse_args()  
@@ -291,7 +291,7 @@ def main(argv):
         pass
 
     if args.action == 'run':
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
+        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,checks=args.checks,external_file=args.existing_file,scheduler_wireup_host_port=args.scheduler_wireup)
     elif args.action =='stop':
         stop_job(args.name,False,args.nomad_location)
     elif args.action == 'reload':
