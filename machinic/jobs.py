@@ -31,9 +31,9 @@ def nomad_address():
     return nomad_ip,nomad_port
 
 def get_scheduler_jobs(nomad_location=None):
-    nomad,nomad_ip,nomad_port = nomad_address(nomad_location)
-    print(nomad,nomad_ip,nomad_port)
-    print(subprocess.check_output('{} status -address=http://{}:{}'.format(nomad,nomad_ip,nomad_port).split()).decode())
+    nomad_ip,nomad_port = nomad_address()
+    print(nomad_ip,nomad_port)
+    print(subprocess.check_output('{} status -address=http://{}:{}'.format(nomad_location,nomad_ip,nomad_port).split()).decode())
 
 
 def get_scheduler_services():
@@ -66,13 +66,13 @@ def get_job_raw(name,path=".jobs",file=None):
 def stop_job(name,purge=False,nomad_location=None):
     logger.info("stopping {}".format(name))
 
-    nomad,nomad_ip,nomad_port = nomad_address()
+    nomad_ip,nomad_port = nomad_address()
     if purge:
         purge = '-purge'
     else:
         purge=''
 
-    print(subprocess.check_output('{} stop -address=http://{}:{} {} {}'.format(nomad,nomad_ip,nomad_port,purge,name).split()).decode())
+    print(subprocess.check_output('{} stop -address=http://{}:{} {} {}'.format(nomad_location,nomad_ip,nomad_port,purge,name).split()).decode())
 
 def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=None,no_default_host_port_args=None):
     #pass in checks as list of textfiles with path
