@@ -23,16 +23,12 @@ logzero.logfile("/tmp/{}.log".format(os.path.basename(sys.argv[0])))
 
 #nomad does not accept underscores in job names
 
-def nomad_details(nomad=None):
-    if nomad is None:
-        nomad = "nomad"
-
+def nomad_details():
     c = consul.Consul()
     nomad_details = c.agent.services()['_nomad-server-nomad-http']
-    #{'Port': 4646, 'EnableTagOverride': False, 'ID': '_nomad-server-nomad-http', 'Service': 'nomad', 'Tags': ['http'], 'CreateIndex': 0, 'ModifyIndex': 0, 'Address': '192.168.0.155'}
     nomad_port = nomad_details['Port']
     nomad_ip = nomad_details['Address']
-    return nomad,nomad_ip,nomad_port
+    return nomad_ip,nomad_port
 
 def list_jobs(nomad_location=None):
     nomad,nomad_ip,nomad_port = nomad_details(nomad_location)
@@ -48,11 +44,11 @@ def list_services():
     for k in services.keys():
         print("{}\t{}\t{}".format(services[k]['Service'].ljust(15),services[k]['Address'],services[k]['Port']))
 
-def get_job(name,path=".jobs",file=None,nomad_location=None):
+def get_job(name,path=".jobs",file=None):
     if not os.path.exists(os.path.abspath(path)):
         os.makedirs(path)
 
-    nomad,nomad_ip,nomad_port = nomad_details(nomad_location)
+    nomad_ip,nomad_port = nomad_details()
     gs = 'http://{}:{}/v1/job/{}'.format(nomad_ip,nomad_port,name)
     r = requests.get(gs)
     logger.info(r.text)
@@ -106,7 +102,7 @@ def run_external_job(external_file):
         f.write(json.dumps(j, indent=4))
 
 
-def run_job(name,command,args,path=".jobs",tags=None,verbose=False,nomad_location=None,external_file=None,checks=None,no_default_host_port_args=None):
+def run_job(name,command,args,path=".jobs",tags=None,verbose=False,external_file=None,checks=None,no_default_host_port_args=None):
     #pass in checks as list of textfiles with path
     args = list(filter(None, args)) 
 
@@ -117,7 +113,7 @@ def run_job(name,command,args,path=".jobs",tags=None,verbose=False,nomad_locatio
     logger.info("job path: {}".format(os.path.abspath(path)))
 
     logger.info("preparing to run job: {}".format(name))
-    nomad,nomad_ip,nomad_port = nomad_details(nomad_location)
+    nomad_ip,nomad_port = nomad_details()
     logger.info("nomad address: http://{}:{}".format(nomad_ip,nomad_port))
 
     config = {}
@@ -219,18 +215,11 @@ def run_job(name,command,args,path=".jobs",tags=None,verbose=False,nomad_locatio
             with open(external_file) as json_data:
                 j = json.load(json_data)
 
-    if verbose:
-        print(j)
-
     job_submit_endpoint = 'http://{}:{}/v1/job/{}'.format(nomad_ip,nomad_port,name)
     logger.info("submitting(PUT) job json to: {}".format(job_submit_endpoint))
     r = requests.put(job_submit_endpoint, json=j)
     logger.info("{}".format(r))
     logger.info(j)
-
-    # if r.status_code == 400:
-    #     foo = subprocess.check_output('{} run {}'.format(nomad,external_file).split()) 
-    #     print(foo)
 
     json_file = '{}.json'.format(name)
 
@@ -275,16 +264,18 @@ def main(argv):
         "warn":logging.WARN,
         "error":logging.ERROR,
     }
+
+    jobs_path = os.path.expanduser('~/.local/jobs')
+
     tutorial_string = textwrap.dedent("""
-        Generate control files example:
+        Example: Generate control scripts(start.sh, stop.sh):
             
-            python3 machine.py run --name foo --path ../machine_foo/machine.yaml
+            python3 machine.py run --name foo --file ~/machine_foo/machine.yaml
 
-        start a job example:
+        job files are stored at:
+            {}
+    """.format(jobs_path))
 
-            python3 jobs.py run --name foo --command=<machinic path>/connector.py --args \"--server --service-files foo.bar foo.baz\" 
-
-    """)
     parser = argparse.ArgumentParser(description=main.__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser = argparse.ArgumentParser(epilog=tutorial_string,formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -292,24 +283,17 @@ def main(argv):
     parser.add_argument("--name",required=foo(argv) , help="job name/id")
     parser.add_argument("--command",required=run_existing(argv), help="full path of command to call",default=None)
     parser.add_argument("--args", help="Args,kwargs and flags to be used by command. A string separated by space, quoted at beginning and end to avoid parsing. Example: \"--foo bar.baz --another-flag\" ",default=[])
-    #parser.add_argument("-f","--file", help="Write retrieved hcl or run output to file. Path/name can be specified or if flag only: <name>.json",nargs='?',default=False)
-    parser.add_argument("--nomad-location", help="nomad binary location",default=None)
+    parser.add_argument("--nomad-location", help="nomad binary location",default="nomad")
     parser.add_argument("-v","--verbose",action="store_true", help="verbose")
     parser.add_argument("--existing-file", help="",default=False)
     parser.add_argument("-c","--checks",help="checks ie gphoto2")
     parser.add_argument("--log-level", choices=['debug','info','warn','error'],default="info",help="checks ie gphoto2")
-
-    jobs_path = os.path.expanduser('~/.local/jobs')
-
     parser.add_argument("-j","--jobs-path", help="directory to story job output and generated files default: ~/.local/jobs" ,default=jobs_path)
     parser.add_argument("-t","--tags", help="store in tags",nargs='+',default=None)
     parser.add_argument("--no-default-args", action='store_true',default=False)
 
     #TODO tutorial string on error with no arguments
     args = parser.parse_args()  
-
-    if args.nomad_location is None:
-        args.nomad_location = "nomad"
 
     logzero.loglevel(log_levels[args.log_level])
     
@@ -319,7 +303,7 @@ def main(argv):
         pass
 
     if args.action == 'run':
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,verbose=args.verbose,nomad_location=args.nomad_location,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
+        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,verbose=args.verbose,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
     if args.action == 'rerun':
         args.existing_file = os.path.join(os.path.expanduser('~/.local/jobs'),args.name)
         formats={}
@@ -341,7 +325,7 @@ def main(argv):
                     args.existing_file+=k
                     break
 
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,verbose=args.verbose,nomad_location=args.nomad_location,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
+        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,verbose=args.verbose,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
     elif args.action =='stop':
         stop_job(args.name,False,args.verbose,args.nomad_location)
     elif args.action == 'reload':
@@ -349,13 +333,11 @@ def main(argv):
         if not os.path.isfile(reload_file):
             if not os.path.isfile(os.path.join(args.jobs_path,reload_file)):
                 parser.error('{} not found at {}'.format(reload_file,os.path.join(args.jobs_path,reload_file)))
-        #json returned from nomad get is not same as json created from hcl
-        #job_json = get_job(args.name,args.file,args.nomad_location)
         logger.info("reloading {}".format(args.name))
         stop_job(args.name,False,args.verbose,args.nomad_location)
         run_job(args.name,'',[],verbose=args.verbose,external_file=reload_file)
     elif args.action == 'run-file':
-        run_job(args.name,'',args.args,verbose=args.verbose,nomad_location=args.nomad_location,external_file=args.existing_file)
+        run_job(args.name,'',args.args,verbose=args.verbose,external_file=args.existing_file)
     elif args.action =='purge':
         stop_job(args.name,True,args.verbose,args.nomad_location)
     elif args.action == 'status':
@@ -363,7 +345,7 @@ def main(argv):
     elif args.action == 'status-raw':
         list_services()
     elif args.action == 'get':
-        get_job(args.name,path=args.jobs_path,nomad_location=args.nomad_location)
+        get_job(args.name,path=args.jobs_path)
 
 if __name__ == "__main__":
     main(sys.argv)
