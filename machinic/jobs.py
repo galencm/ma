@@ -255,7 +255,7 @@ def main(argv):
     parser = argparse.ArgumentParser(description=main.__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser = argparse.ArgumentParser(epilog=tutorial_string,formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("action", help="stop|run|run-file|reload|status|status-raw|get|purge|rerun", choices=['run','run-file','stop','reload','status','status-raw','get','purge','rerun'])
+    parser.add_argument("action", help="stop|run|run-file|reload|status|status-raw|get|purge", choices=['run','run-file','stop','reload','status','status-raw','get','purge'])
     parser.add_argument("--name",required=foo(argv) , help="job name/id")
     parser.add_argument("--command",required=run_existing(argv), help="full path of command to call",default=None)
     parser.add_argument("--args", help="Args,kwargs and flags to be used by command. A string separated by space, quoted at beginning and end to avoid parsing. Example: \"--foo bar.baz --another-flag\" ",default=[])
@@ -278,28 +278,6 @@ def main(argv):
         pass
 
     if args.action == 'run':
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
-    if args.action == 'rerun':
-        args.existing_file = os.path.join(os.path.expanduser('~/.local/jobs'),args.name)
-        formats={}
-
-        #if no extension...
-        for ext in [".json",".hcl"]:
-            f_ext = args.existing_file+ext
-            #formats.append(os.path.isfile(f_ext))
-            formats[ext] = os.path.isfile(f_ext)
-
-            print("{} {}".format(f_ext, formats[ext]))
-
-        if len(set(list(formats.keys()))) == 1 and False in formats:
-            print("no files found there!")
-            return 
-        else:
-            for k,v in formats.items():
-                if v is True:    
-                    args.existing_file+=k
-                    break
-
         run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
     elif args.action =='stop':
         stop_job(args.name,False,args.nomad_location)
