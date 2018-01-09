@@ -25,7 +25,17 @@ logzero.logfile("/tmp/{}.log".format(os.path.basename(sys.argv[0])))
 
 def nomad_address():
     c = consul.Consul()
-    nomad_details = c.agent.services()['_nomad-server-nomad-http']
+    try:
+        nomad_details = c.agent.services()['_nomad-server-nomad-http']
+    except KeyError:
+        # running nomad server in dev mode
+        # uses a uuid suffix rather than -http
+        # try to match port
+        for k,v in c.agent.services():
+            if v['Port'] == 4646:
+                nomad_details = v
+                return
+
     nomad_port = nomad_details['Port']
     nomad_ip = nomad_details['Address']
     return nomad_ip,nomad_port
