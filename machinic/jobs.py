@@ -74,7 +74,7 @@ def stop_job(name,purge=False,nomad_location=None):
 
     print(subprocess.check_output('{} stop -address=http://{}:{} {} {}'.format(nomad_location,nomad_ip,nomad_port,purge,name).split()).decode())
 
-def run_job(name,command,args,path=".jobs",tags=None,external_file=None,scheduler_checks=None,scheduler_wireup_host_port=None,scheduler="nomad"):
+def run_job(name,command,args,scheduler_binary=None,path=".jobs",tags=None,external_file=None,scheduler_checks=None,scheduler_wireup_host_port=None,scheduler="nomad"):
     #pass in checks as list of textfiles with path
     args = list(filter(None, args)) 
 
@@ -169,7 +169,7 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,schedule
             f.write(job_hcl)
 
         logger.info("converting .hcl to .json for submission")
-        job_json = subprocess.check_output('{} run -output {}.hcl'.format(nomad,os.path.join(path,name)).split()) 
+        job_json = subprocess.check_output('{} run -output {}.hcl'.format(scheduler_binary,os.path.join(path,name)).split())
         job_json=job_json.decode()
 
         logger.info("loading json")
@@ -181,7 +181,7 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,schedule
 
         if external_file.endswith('.hcl'):
             logger.info("converting .hcl to .json for submission")
-            job_json = subprocess.check_output('{} run -output {}'.format(nomad,external_file).split()) 
+            job_json = subprocess.check_output('{} run -output {}'.format(scheduler_binary,external_file).split())
             job_json=job_json.decode()
             logger.info("loading json")
             j = json.loads(job_json)
@@ -291,15 +291,15 @@ def main(argv):
         pass
 
     if args.action == 'run':
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,scheduler_checks=args.checks,external_file=args.existing_file,scheduler_wireup_host_port=args.scheduler_wireup)
+        run_job(args.name,args.command,args.args,scheduler_binary=args.nomad_location,path=args.jobs_path,tags=args.tags,scheduler_checks=args.checks,external_file=args.existing_file,scheduler_wireup_host_port=args.scheduler_wireup)
     elif args.action =='stop':
         stop_job(args.name,False,args.nomad_location)
     elif args.action == 'reload':
         reload_file = '{}.json'.format(args.name)
         stop_job(args.name,False,args.nomad_location)
-        run_job(args.name,'',[],external_file=reload_file)
+        run_job(args.name,'',[],external_file=reload_file,scheduler_binary=args.nomad_location)
     elif args.action == 'run-file':
-        run_job(args.name,'',args.args,external_file=args.existing_file)
+        run_job(args.name,'',args.args,external_file=args.existing_file,scheduler_binary=args.nomad_location)
     elif args.action =='purge':
         stop_job(args.name,True,args.nomad_location)
     elif args.action == 'status':
