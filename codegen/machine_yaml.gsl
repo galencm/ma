@@ -65,13 +65,13 @@ includes:
 . for include
  - $(include.file):
 . if (.duplicates ?= "true" | .duplicates ?= "false")
-    duplicates: $(include.duplicates:Neat)
+    allow-duplicates: $(include.duplicates:Neat)
 . endif    
-. if (.connect_args ?= "true" | .connect_args ?= "false")
-    connect_args: $(include.connect_args:Neat)
+. if (.wireup ?= "true" | .wireup ?= "false")
+    auto-wireup: $(include.wireup:Neat)
 . endif  
 . if (.rpc ?= "true" | .rpc ?= "false")
-    rpc: $(include.rpc:Neat)
+    as-rpc: $(include.rpc:Neat)
 . endif  
 . if (.location ?<> "")
     location: $(include.location:)

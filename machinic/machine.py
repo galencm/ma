@@ -145,17 +145,19 @@ def generate_control_scripts(path,files,states,machine_name):
     #.hcl
     for file in files:
         #serve with zerorpc
-        rpc = True
+        rpc = False
         #--host --port supplied by nomad
-        default_connectivity = True
+        default_connectivity = False
         args = []
         location = False
         for filename,params in file.items():
             if filename.endswith(".hcl"):
                 rpc = False
             try:
-                if params['rpc'] is False:
+                if params['as-rpc'] is False:
                     rpc = False
+                elif params['as-rpc'] is True:
+                    rpc = True
             except Exception as ex:
                 pass
 
@@ -172,10 +174,12 @@ def generate_control_scripts(path,files,states,machine_name):
                 location = False
 
             try:
-                if params['connect_args'] is False:
+                if params['auto-wireup'] is False:
                     default_connectivity = False
+                elif params['auto-wireup'] is True:
+                    default_connectivity = True
 
-                if params['duplicates'] is True:
+                if params['allow-duplicates'] is True:
                     job_name = os.path.splitext(os.path.basename(filename))[0]
                     job_name+="-"+str(uuid.uuid4())[:8]
                     #this will fail due to incorrect arguments?
