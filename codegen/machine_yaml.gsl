@@ -1,0 +1,230 @@
+.- This Source Code Form is subject to the terms of the Mozilla Public
+.- License, v. 2.0. If a copy of the MPL was not distributed with this
+.- file, You can obtain one at http://mozilla.org/MPL/2.0/.
+.- 
+.- Copyright (c) 2017, Galen Curwen-McAdams
+.-
+. if switches.arg1 ?<> ""
+. define output_file = switches.arg1+".yaml"
+. else
+. define output_file = "machine.yaml"
+. define switches.arg1 = "machine"
+. endif
+
+. dir = directory.create("./"+switches.arg1+"/generated") ?
+
+.output "./"+switches.arg1+"/"+output_file
+
+description:
+    $(machine.description)
+
+aliases:
+.for alias
+  $(alias.name): &$(alias.alias) $(alias.value)
+.endfor
+
+.for source
+. new include
+. if source.type = "primitive_bytes"
+. define include.file = "source.py"
+. elsif source.type = "primitive_bytes_indexable"
+. define include.file = "source_indexable.py"
+. endif 
+. define include.rpc = "false"
+. define include.name = source.location
+. define foo = xml.load_string("<argument>--source-name</argument>")
+. copy foo to include
+. define foo = xml.load_string("<argument>$(source.location)</argument>")
+. copy foo to include
+. if source.source = "boook"
+. define foo = xml.load_string("<argument>--source</argument>")
+. copy foo to include
+. define foo = xml.load_string("<argument>boook</argument>")
+. copy foo to include
+.endif
+
+. move include to machine
+. endnew
+.endfor
+. for peripheral
+. for .input as input
+. if input.source ?<> ""
+. new route
+. define route.trigger = input.source
+. define route.call = "$(input -> call)"
+.- if "$(input -> argument)" ?<> ""
+.-copy entire child not attribute!
+. copy input -> argument to route
+.- endif 
+.move route to machine
+. endnew
+. endif
+. endfor
+. endfor
+includes:
+. for include
+ - $(include.file):
+. if (.duplicates ?= "true" | .duplicates ?= "false")
+    duplicates: $(include.duplicates:Neat)
+. endif    
+. if (.connect_args ?= "true" | .connect_args ?= "false")
+    connect_args: $(include.connect_args:Neat)
+. endif  
+. if (.rpc ?= "true" | .rpc ?= "false")
+    rpc: $(include.rpc:Neat)
+. endif  
+. if (.location ?<> "")
+    location: $(include.location:)
+. endif  
+. if .name ?<> ""
+    name: $(include.name)
+. endif
+. define I = 0
+. for argument
+.- crude way to check if empty
+. I+=1
+. endfor
+. if I = 0
+.define args = ""
+.else
+.define args = "["
+.endif
+.for argument
+.if argument.alias ?<> ""
+.args+="*"+argument.alias
+.else
+.args+=argument
+.endif
+. if last() = 0
+.args+=","
+.endif
+.endfor  
+. if I > 0
+.args+="]"
+.endif
+.if args ?<> ""
+    args: $(args)
+.endif
+. define I = 0
+. for check
+.- crude way to check if empty
+. I+=1
+. endfor
+. if I = 0
+.define checks = ""
+.else
+.define checks = "["
+.endif
+.for check
+.checks+=check
+. if last() = 0
+.checks+=","
+.endif
+.endfor  
+. if I > 0
+.checks+="]"
+.endif
+.if checks ?<> ""
+    checks: $(checks)
+.endif
+.endfor
+.-endfor
+
+routes:
+. for route
+. define args = ""
+. for argument
+. args += argument
+. if last() = 0
+. args += " "
+. endif
+. endfor
+. define comparative = ""
+. define I = 0
+. for conditional
+.- crude way to check if empty
+. I+=1
+. endfor
+. if I = 0
+. comparative += "'"
+. comparative += route.trigger
+. comparative += "'"
+. endif
+. for conditional
+. if conditional.type = "less than or equal"
+. define compare_symbol =  " <= "
+. elsif conditional.type = "greater than or equal"
+. define compare_symbol =   " >= "
+. elsif conditional.type = "greater than"
+. define compare_symbol =  " > "
+. elsif conditional.type = "less than"
+. define compare_symbol =  " < "
+. elsif conditional.type = "equals"
+. define compare_symbol =  " == "
+. endif
+. if total(conditional) = 1
+. define comparative += "'"
+. comparative += route.trigger
+. comparative += "'"
+. comparative += compare_symbol
+. comparative += conditional
+. endif
+. if last(conditional) = 0 & total(conditional) = 2
+. comparative += conditional
+. comparative += compare_symbol
+.endif
+. if last(conditional) = 1 & total(conditional) = 2
+. comparative += " "
+. comparative += "'"
+. comparative += route.trigger
+. comparative += "'"
+. comparative += compare_symbol
+. comparative += conditional
+. endif
+. endfor
+ - "if $(comparative) do $(route.call) $(args)"
+.endfor
+
+pipes:
+ - > 
+.for sequence
+  pipe $(sequence.name) {
+.for step
+.define args = ""
+.define description = step.description+": " ? ""
+.for argument
+.args+=argument
+. if last() = 0
+. args += " "
+. endif
+.endfor
+      $(description)$(step.call) $(args)
+.endfor
+  }
+.endfor
+
+rules:
+.for pattern
+.define rulestring = ""
+.for rule
+.rulestring+="['"+rule.field+"','"+rule.field_type+"']"
+. if last() = 0
+.rulestring+=","
+.endif
+.endfor
+ - [$(pattern.name),$(rulestring)]
+.endfor
+
+.-can set and prepare be combined?
+prepare:
+.for prepare
+ - $(prepare.file)
+.endfor
+
+set:
+.for source
+ - $(source.location:):
+.for set
+   - $(set.symbol:):$(set.peripheral:): $(set.value:)
+.endfor
+.endfor
