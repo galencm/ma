@@ -243,14 +243,27 @@ def main(argv):
 
     jobs_path = os.path.expanduser('~/.local/jobs')
 
-    tutorial_string = textwrap.dedent("""
-        Example: Generate control scripts(start.sh, stop.sh):
-            
-            python3 machine.py run --name foo --file ~/machine_foo/machine.yaml
+    tutorial_string = """
+    Job files will be stored at(override with -j):
+        {}
 
-        job files are stored at:
-            {}
-    """.format(jobs_path))
+    Actions:
+
+        jobs.py [action]
+
+            status:       prints scheduler jobs
+            status-raw:   prints scheduler jobs with ip address and port(useful for debugging)
+
+        jobs.py [action] --name [job_name]
+
+            run:          run job with args from --command
+            stop:         stop job
+            run-file:     run a job from file
+            reload:       reload a job
+            purge:        stop job and delete job file
+            get:          get raw job json from scheduler
+
+    """.format(jobs_path)
 
     parser = argparse.ArgumentParser(description=main.__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser = argparse.ArgumentParser(epilog=tutorial_string,formatter_class=argparse.RawDescriptionHelpFormatter)
