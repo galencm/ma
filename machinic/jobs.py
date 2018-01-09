@@ -74,28 +74,6 @@ def stop_job(name,purge=False,nomad_location=None):
 
     print(subprocess.check_output('{} stop -address=http://{}:{} {} {}'.format(nomad,nomad_ip,nomad_port,purge,name).split()).decode())
 
-def run_external_job(external_file):
-    external_file = os.path.join(path,external_file)
-    logger.info("loading {}".format(external_file))
-    if external_file.endswith('.hcl'):
-        job_json = subprocess.check_output('{} run -output {}'.format(nomad,external_file).split()) 
-        j = json.loads(job_json)
-
-    elif external_file.endswith('.json'):
-        with open(external_file) as json_data:
-            j = json.load(json_data)
-
-    req = 'http://{}:{}/v1/job/{}'.format(nomad_ip,nomad_port,name)
-
-    r = requests.put(req, json=j)
-    print(r.status_code)
-    
-    fname = '{}.json'.format(name)
-
-    with open(os.path.join(path,fname),'w+') as f:
-        f.write(json.dumps(j, indent=4))
-
-
 def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=None,no_default_host_port_args=None):
     #pass in checks as list of textfiles with path
     args = list(filter(None, args)) 
