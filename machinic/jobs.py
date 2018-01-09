@@ -23,20 +23,20 @@ logzero.logfile("/tmp/{}.log".format(os.path.basename(sys.argv[0])))
 
 #nomad does not accept underscores in job names
 
-def nomad_details():
+def nomad_address():
     c = consul.Consul()
     nomad_details = c.agent.services()['_nomad-server-nomad-http']
     nomad_port = nomad_details['Port']
     nomad_ip = nomad_details['Address']
     return nomad_ip,nomad_port
 
-def list_jobs(nomad_location=None):
-    nomad,nomad_ip,nomad_port = nomad_details(nomad_location)
+def get_scheduler_jobs(nomad_location=None):
+    nomad,nomad_ip,nomad_port = nomad_address(nomad_location)
     print(nomad,nomad_ip,nomad_port)
     print(subprocess.check_output('{} status -address=http://{}:{}'.format(nomad,nomad_ip,nomad_port).split()).decode())
 
 
-def list_services():
+def get_scheduler_services():
     c = consul.Consul()
     services = {k:v for (k,v) in c.agent.services().items() if k.startswith("_nomad")}
     logger.info("retrieving service details from consul")
@@ -44,11 +44,11 @@ def list_services():
     for k in services.keys():
         print("{}\t{}\t{}".format(services[k]['Service'].ljust(15),services[k]['Address'],services[k]['Port']))
 
-def get_job(name,path=".jobs",file=None):
+def get_job_raw(name,path=".jobs",file=None):
     if not os.path.exists(os.path.abspath(path)):
         os.makedirs(path)
 
-    nomad_ip,nomad_port = nomad_details()
+    nomad_ip,nomad_port = nomad_address()
     gs = 'http://{}:{}/v1/job/{}'.format(nomad_ip,nomad_port,name)
     r = requests.get(gs)
     logger.info(r.text)
@@ -66,7 +66,7 @@ def get_job(name,path=".jobs",file=None):
 def stop_job(name,purge=False,nomad_location=None):
     logger.info("stopping {}".format(name))
 
-    nomad,nomad_ip,nomad_port = nomad_details(nomad_location)
+    nomad,nomad_ip,nomad_port = nomad_address()
     if purge:
         purge = '-purge'
     else:
@@ -89,7 +89,7 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=N
     logger.info("job path: {}".format(os.path.abspath(path)))
 
     logger.info("preparing to run job: {}".format(name))
-    nomad_ip,nomad_port = nomad_details()
+    nomad_ip,nomad_port = nomad_address()
     logger.info("nomad address: http://{}:{}".format(nomad_ip,nomad_port))
 
     config = {}
@@ -203,13 +203,13 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=N
     with open(os.path.join(path,json_file),'w+') as f:
         f.write(json.dumps(j, indent=4))
 
-def foo(args):
+def job_name_needed(args):
     if 'status' in args or 'status-raw' in args:
         return False
     else:
         return True
 
-def run_existing(argv):
+def command_needed(argv):
     #parser.add_argument("--command",required='run' in argv , help="full path of command to call")
     logger.info("args: {}".format(argv))
     job_name = ""
@@ -256,8 +256,8 @@ def main(argv):
     parser = argparse.ArgumentParser(epilog=tutorial_string,formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument("action", help="stop|run|run-file|reload|status|status-raw|get|purge", choices=['run','run-file','stop','reload','status','status-raw','get','purge'])
-    parser.add_argument("--name",required=foo(argv) , help="job name/id")
-    parser.add_argument("--command",required=run_existing(argv), help="full path of command to call",default=None)
+    parser.add_argument("--name",required=job_name_needed(argv) , help="job name/id")
+    parser.add_argument("--command",required=command_needed(argv), help="full path of command to call",default=None)
     parser.add_argument("--args", help="Args,kwargs and flags to be used by command. A string separated by space, quoted at beginning and end to avoid parsing. Example: \"--foo bar.baz --another-flag\" ",default=[])
     parser.add_argument("--nomad-location", help="nomad binary location",default="nomad")
     parser.add_argument("--existing-file", help="",default=False)
@@ -283,7 +283,6 @@ def main(argv):
         stop_job(args.name,False,args.nomad_location)
     elif args.action == 'reload':
         reload_file = '{}.json'.format(args.name)
-        logger.info("reloading {}".format(args.name))
         stop_job(args.name,False,args.nomad_location)
         run_job(args.name,'',[],external_file=reload_file)
     elif args.action == 'run-file':
@@ -291,11 +290,11 @@ def main(argv):
     elif args.action =='purge':
         stop_job(args.name,True,args.nomad_location)
     elif args.action == 'status':
-        list_jobs(args.nomad_location)
+        get_scheduler_jobs(args.nomad_location)
     elif args.action == 'status-raw':
-        list_services()
+        get_scheduler_services()
     elif args.action == 'get':
-        get_job(args.name,path=args.jobs_path)
+        get_job_raw(args.name,path=args.jobs_path)
 
 if __name__ == "__main__":
     main(sys.argv)
