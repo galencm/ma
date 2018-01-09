@@ -78,6 +78,10 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=N
     #pass in checks as list of textfiles with path
     args = list(filter(None, args)) 
 
+    if external_file is not None and not os.path.isfile(external_file):
+        logger.error("no file to load: {}".format(external_file))
+        return
+
     if not os.path.exists(os.path.abspath(path)):
         logger.info("creating: {}".format(os.path.abspath(path)))
         os.makedirs(path)
@@ -301,9 +305,6 @@ def main(argv):
         stop_job(args.name,False,args.nomad_location)
     elif args.action == 'reload':
         reload_file = '{}.json'.format(args.name)
-        if not os.path.isfile(reload_file):
-            if not os.path.isfile(os.path.join(args.jobs_path,reload_file)):
-                parser.error('{} not found at {}'.format(reload_file,os.path.join(args.jobs_path,reload_file)))
         logger.info("reloading {}".format(args.name))
         stop_job(args.name,False,args.nomad_location)
         run_job(args.name,'',[],external_file=reload_file)
