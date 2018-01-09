@@ -11,9 +11,9 @@
 . define switches.arg1 = "machine"
 . endif
 
-. dir = directory.create("./"+switches.arg1+"/generated") ?
+. dir = directory.create(switches.arg2+"/generated") ?
 
-.output "./"+switches.arg1+"/"+output_file
+.output switches.arg2+"/"+output_file
 
 description:
     $(machine.description)
