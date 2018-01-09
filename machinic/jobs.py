@@ -140,7 +140,7 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,schedule
               {% for arg in args -%}
               "{{arg}}"{{ "," }}
               {%- endfor %}
-              {% if scheduler_wireup_host_port != true %}
+              {% if scheduler_wireup_host_port == true %}
               "--host","${NOMAD_IP_service_port}",
               "--port","${NOMAD_PORT_service_port}",
               {% endif%}
@@ -273,7 +273,7 @@ def main(argv):
     parser.add_argument("--command",required=command_needed(argv), help="full path of command to call",default=None)
     parser.add_argument("--args", help="Args,kwargs and flags to be used by command. A string separated by space, quoted at beginning and end to avoid parsing. Example: \"--foo bar.baz --another-flag\" ",default=[])
     parser.add_argument("--nomad-location", help="nomad binary location",default="nomad")
-    parser.add_argument("--existing-file", help="",default=False)
+    parser.add_argument("--existing-file", help="",default=None)
     parser.add_argument("-c","--checks",help="checks ie gphoto2")
     parser.add_argument("--log-level", choices=['debug','info','warn','error'],default="info",help="checks ie gphoto2")
     parser.add_argument("-j","--jobs-path", help="directory to story job output and generated files default: ~/.local/jobs" ,default=jobs_path)
