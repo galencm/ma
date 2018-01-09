@@ -63,7 +63,7 @@ def get_job(name,path=".jobs",file=None):
 
     return r.json()
 
-def stop_job(name,purge=False,verbose=False,nomad_location=None):
+def stop_job(name,purge=False,nomad_location=None):
     logger.info("stopping {}".format(name))
 
     nomad,nomad_ip,nomad_port = nomad_details(nomad_location)
@@ -73,9 +73,6 @@ def stop_job(name,purge=False,verbose=False,nomad_location=None):
         purge=''
 
     print(subprocess.check_output('{} stop -address=http://{}:{} {} {}'.format(nomad,nomad_ip,nomad_port,purge,name).split()).decode())
-    if verbose:
-        #print(subprocess.check_output('{} status -address=http://{}:{}'.format(nomad,nomad_ip,nomad_port).split()).decode())
-        list_jobs()
 
 def run_external_job(external_file):
     external_file = os.path.join(path,external_file)
@@ -88,9 +85,6 @@ def run_external_job(external_file):
         with open(external_file) as json_data:
             j = json.load(json_data)
 
-    if verbose:
-        print(j)
-
     req = 'http://{}:{}/v1/job/{}'.format(nomad_ip,nomad_port,name)
 
     r = requests.put(req, json=j)
@@ -102,7 +96,7 @@ def run_external_job(external_file):
         f.write(json.dumps(j, indent=4))
 
 
-def run_job(name,command,args,path=".jobs",tags=None,verbose=False,external_file=None,checks=None,no_default_host_port_args=None):
+def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=None,no_default_host_port_args=None):
     #pass in checks as list of textfiles with path
     args = list(filter(None, args)) 
 
@@ -284,7 +278,6 @@ def main(argv):
     parser.add_argument("--command",required=run_existing(argv), help="full path of command to call",default=None)
     parser.add_argument("--args", help="Args,kwargs and flags to be used by command. A string separated by space, quoted at beginning and end to avoid parsing. Example: \"--foo bar.baz --another-flag\" ",default=[])
     parser.add_argument("--nomad-location", help="nomad binary location",default="nomad")
-    parser.add_argument("-v","--verbose",action="store_true", help="verbose")
     parser.add_argument("--existing-file", help="",default=False)
     parser.add_argument("-c","--checks",help="checks ie gphoto2")
     parser.add_argument("--log-level", choices=['debug','info','warn','error'],default="info",help="checks ie gphoto2")
@@ -303,7 +296,7 @@ def main(argv):
         pass
 
     if args.action == 'run':
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,verbose=args.verbose,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
+        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
     if args.action == 'rerun':
         args.existing_file = os.path.join(os.path.expanduser('~/.local/jobs'),args.name)
         formats={}
@@ -325,21 +318,21 @@ def main(argv):
                     args.existing_file+=k
                     break
 
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,verbose=args.verbose,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
+        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,checks=args.checks,external_file=args.existing_file,no_default_host_port_args=args.no_default_args)
     elif args.action =='stop':
-        stop_job(args.name,False,args.verbose,args.nomad_location)
+        stop_job(args.name,False,args.nomad_location)
     elif args.action == 'reload':
         reload_file = '{}.json'.format(args.name)
         if not os.path.isfile(reload_file):
             if not os.path.isfile(os.path.join(args.jobs_path,reload_file)):
                 parser.error('{} not found at {}'.format(reload_file,os.path.join(args.jobs_path,reload_file)))
         logger.info("reloading {}".format(args.name))
-        stop_job(args.name,False,args.verbose,args.nomad_location)
-        run_job(args.name,'',[],verbose=args.verbose,external_file=reload_file)
+        stop_job(args.name,False,args.nomad_location)
+        run_job(args.name,'',[],external_file=reload_file)
     elif args.action == 'run-file':
-        run_job(args.name,'',args.args,verbose=args.verbose,external_file=args.existing_file)
+        run_job(args.name,'',args.args,external_file=args.existing_file)
     elif args.action =='purge':
-        stop_job(args.name,True,args.verbose,args.nomad_location)
+        stop_job(args.name,True,args.nomad_location)
     elif args.action == 'status':
         list_jobs(args.nomad_location)
     elif args.action == 'status-raw':
