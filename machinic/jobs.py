@@ -74,7 +74,7 @@ def stop_job(name,purge=False,nomad_location=None):
 
     print(subprocess.check_output('{} stop -address=http://{}:{} {} {}'.format(nomad_location,nomad_ip,nomad_port,purge,name).split()).decode())
 
-def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=None,scheduler_wireup_host_port=None):
+def run_job(name,command,args,path=".jobs",tags=None,external_file=None,scheduler_checks=None,scheduler_wireup_host_port=None,scheduler="nomad"):
     #pass in checks as list of textfiles with path
     args = list(filter(None, args)) 
 
@@ -113,7 +113,7 @@ def run_job(name,command,args,path=".jobs",tags=None,external_file=None,checks=N
           }
         ''')
 
-    if checks == 'gphoto2':
+    if scheduler_checks == 'gphoto2':
         config['checks'] = [check_gphoto2]
 
     job_template = textwrap.dedent('''
@@ -291,7 +291,7 @@ def main(argv):
         pass
 
     if args.action == 'run':
-        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,checks=args.checks,external_file=args.existing_file,scheduler_wireup_host_port=args.scheduler_wireup)
+        run_job(args.name,args.command,args.args,path=args.jobs_path,tags=args.tags,scheduler_checks=args.checks,external_file=args.existing_file,scheduler_wireup_host_port=args.scheduler_wireup)
     elif args.action =='stop':
         stop_job(args.name,False,args.nomad_location)
     elif args.action == 'reload':
