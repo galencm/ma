@@ -39,13 +39,6 @@ def status(machine_file='machine.yaml'):
                         active_machines[tag] = []
                     active_machines[tag].append(v['Service'])
 
-    #list all yamls?
-    # print("Machine\t\tStatus\t\tPath")
-    # for f in glob.glob("*"):
-    #     if os.path.isdir(f):
-    #         if os.path.isfile(os.path.join(f,machine_file)):
-    #             print(f+"\t"+"available"+"\t"+os.path.abspath(f))
-    # print()
     print("Machine\t\tComponents")
     for k,v in active_machines.items():
         print(k+"\t"+'\n\t\t'.join(v))        
@@ -286,8 +279,6 @@ def generate_control_scripts(path,files,states,machine_name):
 
     for file in make_executable:
         file = os.path.join(path,file)
-        #logger.debug("chmod 0111 {}".format(file))
-        #TODO check for hasbang at start
 
         try:
             st = os.stat(file)
