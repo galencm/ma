@@ -181,13 +181,17 @@ def generate_control_scripts(path,files,states,machine_name):
                 if params['allow-duplicates'] is True:
                     job_name = os.path.splitext(os.path.basename(filename))[0]
                     job_name+="-"+str(uuid.uuid4())[:8]
-                    #this will fail due to incorrect arguments?
+                    # nomad will not accept job names
+                    # that contain underscores
+                    job_name.replace("_","-")
                     named_files.append((filename,job_name,rpc,args))
             except Exception as ex:
                 try:
                     job_name = params['name']
+                    job_name.replace("_","-")
                 except Exception as ex:
                     job_name = os.path.splitext(os.path.basename(filename))[0]
+                    job_name.replace("_","-")
                 named_files.append((filename,job_name,rpc,args,default_connectivity,location))
 
     template_vars['files'] = named_files
