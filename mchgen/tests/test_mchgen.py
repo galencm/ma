@@ -7,7 +7,19 @@ import shutil
 def machine_directory():
     name = "test"
     destination = "/tmp/{}".format(name)
-    subprocess.call(["./mchgen.sh",name,destination])
+    # use try/except to allow pytest to be
+    # called from inside mchgen dir or from
+    # ma dir
+    try:
+        shutil.rmtree(destination)
+    except FileNotFoundError:
+        pass
+
+    try:
+        subprocess.call(["./mchgen.sh",name,destination])
+    except:
+        subprocess.call(["./mchgen.sh",name,destination],cwd="./mchgen/")
+
     yield destination
     shutil.rmtree(destination)
 
