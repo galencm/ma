@@ -223,12 +223,12 @@ def generate_control_scripts(path,files,states,machine_name):
     {% for f,job,rpc,args,default_connectivity,location in files -%}
     {%- if rpc == True and not f.endswith(".hcl") -%}
     python3 ${JOB_PATH}jobs.py run --name {{prefix}}-{{job}} --tags machine {{machine_name}} --command $CORE_PATH"connector.py" --args "server --service-file {% if location == False %}${MACHINE_PATH}{%elif location == "path" %}{% else %}{{location}}{%- endif -%}
-{{ f }}" {% if default_connectivity == False %} --scheduler-wireup {% endif %}
+{{ f }}" {% if default_connectivity == True %} --scheduler-wireup {% endif %}
     {%- elif rpc == False and not f.endswith(".hcl") -%}
     python3 ${JOB_PATH}jobs.py run --name {{job}} --tags machine {{machine_name}} --command "{% if location == False %}${MACHINE_PATH}{%- elif location == "path" -%}{%- else -%}{{location}}{%- endif -%}
-{{ f }}" --args "{% for arg in args %} {{ arg }} {% endfor %}" {% if default_connectivity == False %} --scheduler-wireup {% endif %} 
+{{ f }}" --args "{% for arg in args %} {{ arg }} {% endfor %}" {% if default_connectivity == True %} --scheduler-wireup {% endif %}
     {% else %}
-    python3 ${JOB_PATH}jobs.py run --name {{job}} --tags machine {{machine_name}} --existing-file {{ f }} {% if default_connectivity == False %} --scheduler-wireup {%- endif -%} 
+    python3 ${JOB_PATH}jobs.py run --name {{job}} --tags machine {{machine_name}} --existing-file {{ f }} {% if default_connectivity == True %} --scheduler-wireup {%- endif -%}
     {% endif %}
     {% endfor %}
     python3 ${JOB_PATH}routes-add --file ${MACHINE_PATH}routes-{{machine_name}}.txt
