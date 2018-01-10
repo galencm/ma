@@ -3,4 +3,4 @@ machine_foo/
 #python
 __pycache__/
 *.py[cod]
-
+.cache

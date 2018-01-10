@@ -5,17 +5,13 @@
 #
 # Copyright (c) 2017, Galen Curwen-McAdams
 
-usage="Usage:  $0 [name]
-        name    (default: 'machine')  machine name
+usage="Usage:  $0 [name] [destination path/directory]
 
-Use a name to    1) generate machine outline
-
-A prefix of machine_ will be added to machine name to create output directory.
-Output directory will be created ../ 
-    ./mchgen.sh foo
+Example: 
+    ./mchgen.sh foo ~/machine_foo
 produces the output:
-                      ../machine_foo
-                      ../machine_foo/<files>
+                      ~/machine_foo
+                      ~/machine_foo/<files>
 
 Currently a newly created outline consists of:
     machine.xml        xml specification for machine(pass to codegen.sh or ma)
@@ -25,18 +21,15 @@ Currently a newly created outline consists of:
     LICENSE            MPL 2.0, default
     AUTHORS            authors file, empty
     README.md          simple readme
-    .gitignore         ignores:
-                           start.sh
-                           stop.sh
-                           restart.sh
-                           .jobs/
-                           __pycache__
+    .gitignore         ignores generated scripts and python cache files
 "
 # show usage if run without arguments
 : ${1?"$usage"}
-#if run without name argument use 'machine'
-#as default
+
 name=${1:-machine}
+: ${2?$(echo missing output destination path)$(exit 1)}
+machine_dir=$2
+mkdir $machine_dir
 
 while getopts ':hs:' option; do
   case "$option" in
@@ -47,16 +40,14 @@ while getopts ':hs:' option; do
 done
 shift $((OPTIND - 1))
 
-machine_dir="machine_${name}"
-mkdir ../$machine_dir
-cp environment.xml ../$machine_dir
-cp environment.sh ../$machine_dir
-cp helloworlds.py  ../$machine_dir
-cp machine.xml     ../$machine_dir
-cp .gitignore      ../$machine_dir
-cp boiler_README.md       ../$machine_dir/README.md 
-cp LICENSE         ../$machine_dir
+cp environment.xml $machine_dir
+cp environment.sh  $machine_dir
+cp helloworlds.py  $machine_dir
+cp machine.xml     $machine_dir
+cp .gitignore      $machine_dir
+cp boiler_README.md $machine_dir/README.md 
+cp LICENSE         $machine_dir
 #create empty AUTHORS file
-touch ../$machine_dir/AUTHORS   ../$machine_dir
+touch $machine_dir/AUTHORS   
 #replace paths from generic to machine name
-sed -i -e "s/machine_foo/$machine_dir/g" ../$machine_dir/README.md
+sed -i -e "s/machine_foo/$machine_dir/g" $machine_dir/README.md
