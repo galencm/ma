@@ -41,7 +41,7 @@ cd ..
 # generate nomad files and start stop scripts from yaml
 cd machinic
 echo $machine_name $machine_path/machine.yaml
-python3 machine.py run --name $machine_name --file $machine_path/$machine_name.yaml
+python3 machine.py generate --name $machine_name --file $machine_path/$machine_name.yaml
 cd ..
 
 # generate environment files from environment xml 
