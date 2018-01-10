@@ -93,7 +93,7 @@ includes:
 .if argument.alias ?<> ""
 .args+="*"+argument.alias
 .else
-.args+=argument
+.args+=argument.value
 .endif
 . if last() = 0
 .args+=","
@@ -134,7 +134,7 @@ routes:
 . for route
 . define args = ""
 . for argument
-. args += argument
+. args += argument.value
 . if last() = 0
 . args += " "
 . endif
@@ -193,7 +193,7 @@ pipes:
 .define args = ""
 .define description = step.description+": " ? ""
 .for argument
-.args+=argument
+.args+=argument.value
 . if last() = 0
 . args += " "
 . endif
