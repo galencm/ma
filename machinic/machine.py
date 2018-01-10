@@ -177,21 +177,20 @@ def generate_control_scripts(path,files,states,machine_name):
                     default_connectivity = False
                 elif params['auto-wireup'] is True:
                     default_connectivity = True
-
                 if params['allow-duplicates'] is True:
                     job_name = os.path.splitext(os.path.basename(filename))[0]
                     job_name+="-"+str(uuid.uuid4())[:8]
                     # nomad will not accept job names
                     # that contain underscores
-                    job_name.replace("_","-")
+                    job_name = job_name.replace("_","-")
                     named_files.append((filename,job_name,rpc,args))
             except Exception as ex:
                 try:
                     job_name = params['name']
-                    job_name.replace("_","-")
+                    job_name = job_name.replace("_","-")
                 except Exception as ex:
                     job_name = os.path.splitext(os.path.basename(filename))[0]
-                    job_name.replace("_","-")
+                    job_name = job_name.replace("_","-")
                 named_files.append((filename,job_name,rpc,args,default_connectivity,location))
 
     template_vars['files'] = named_files
@@ -276,7 +275,6 @@ def generate_control_scripts(path,files,states,machine_name):
     ''')
     for script_name,script_template in [('start.sh',start_template),('stop.sh',stop_template),('restart.sh',restart_template)]:
         logger.warn(template_vars)
-        print("writing {}".format((os.path.join(path,script_name))))
         logger.info("writing {}".format((os.path.join(path,script_name))))
         with open(os.path.join(path,script_name),'w+') as f:
             f.write(jinja2.Environment().from_string(script_template).render(template_vars))
