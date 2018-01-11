@@ -3,6 +3,7 @@
 import argparse
 import pipeling
 import sys
+import os
 def main(argv):
     """
     Add pipe
@@ -15,12 +16,13 @@ def main(argv):
     args = parser.parse_args()
 
     if args.file:
-        with open(args.file,'r') as f:
-            for line in f.readlines():
-                try:
-                    pipeling.remove_pipe(line)
-                except Exception as ex:
-                    print(ex)
+        if os.path.isfile(args.file):
+            with open(args.file,'r') as f:
+                for line in f.readlines():
+                    try:
+                        pipeling.remove_pipe(line)
+                    except Exception as ex:
+                        print(ex)
     elif args.pipe:
         try:
             pipeling.remove_pipe(args.pipe)
