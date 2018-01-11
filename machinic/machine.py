@@ -269,19 +269,19 @@ def generate_control_scripts(path,files,states,machine_name):
         make_executable.append(f)
 
     for file in make_executable:
-        file = os.path.join(path,file)
+        file_path = os.path.join(path,file)
 
         try:
-            st = os.stat(file)
-            os.chmod(file, st.st_mode | 0o111)
+            st = os.stat(file_path)
+            os.chmod(file_path, st.st_mode | 0o111)
         except Exception as ex:
-            logger.warn("tried to make executable: {}".format(file))
+            logger.warn("tried to make executable: {}".format(file_path))
             logger.warn(ex)
 
         shebang_line = ""
         try:
-            if f.endswith(".py"):
-                with open(file, 'r') as f:
+            if file.endswith(".py"):
+                with open(file_path, 'r') as f:
                     shebang_line = f.readline()
                 if "#!/usr/bin/python3" in shebang_line:
                     logger.info("shebang found")
