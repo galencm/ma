@@ -214,9 +214,9 @@ def generate_control_scripts(path,files,states,machine_name):
     python3 ${JOB_PATH}jobs.py run --name {{job}} --tags machine {{machine_name}} --existing-file {{ f }} {% if default_connectivity == True %} --scheduler-wireup {%- endif -%}
     {% endif %}
     {% endfor %}
-    python3 ${JOB_PATH}routes-add --file ${MACHINE_PATH}routes-{{machine_name}}.txt
-    python3 ${JOB_PATH}pipes-add --file ${MACHINE_PATH}pipes-{{machine_name}}.txt
-    python3 ${JOB_PATH}rules-add --file ${MACHINE_PATH}rules-{{machine_name}}.txt
+    lings-route-add --file ${MACHINE_PATH}routes-{{machine_name}}.txt
+    lings-pipe-add --file ${MACHINE_PATH}pipes-{{machine_name}}.txt
+    lings-rule-add --file ${MACHINE_PATH}rules-{{machine_name}}.txt
     {% if states is not none -%}
     {% for k,v in states[0].items() -%}
     {% for state in v -%}
@@ -243,9 +243,9 @@ def generate_control_scripts(path,files,states,machine_name):
     python3 ${JOB_PATH}jobs.py stop --name {{job}}
     {% endif %}
     {%- endfor -%}
-    python3 ${JOB_PATH}routes-remove --file ${MACHINE_PATH}routes-{{machine_name}}.txt
-    python3 ${JOB_PATH}pipes-remove --file ${MACHINE_PATH}pipes-{{machine_name}}.txt
-    python3 ${JOB_PATH}rules-remove --file ${MACHINE_PATH}rules-{{machine_name}}.txt
+    lings-route-remove --file ${MACHINE_PATH}routes-{{machine_name}}.txt
+    lings-pipe-remove --file ${MACHINE_PATH}pipes-{{machine_name}}.txt
+    lings-rule-remove --file ${MACHINE_PATH}rules-{{machine_name}}.txt
 
     ''')
 
