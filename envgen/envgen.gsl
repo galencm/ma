@@ -33,4 +33,10 @@
 .-endif
 . endfor
 
-
+.for machine.environment as environment
+.for environment.script as script
+. echo script.name
+.output "$(output_path)$(script.name)"
+$(script)
+. endfor
+. endfor

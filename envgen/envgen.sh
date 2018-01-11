@@ -45,6 +45,7 @@ Output Sources:
 "
 # show usage if run without arguments
 : ${1?"$usage"}
+xml=$1
 #if run without second argument use './env/'
 #as default
 
@@ -77,13 +78,27 @@ esac
 outdir+="/env/"
 echo $outdir
 
-#$1 xml file
-#$2 output directory
-gsl -a -script:envgen.gsl $1 $outdir 
+# clear scripts generated from <script></script>
+# for file in  $outdir/*.sh
+# do
+#    case "$file" in
+#      *environment.sh* ) continue;;
+#      * ) rm $file;;
+#    esac
+# done
+
+#pass additional arguments to gsl
+gsl -a -script:envgen.gsl $xml $outdir "${@:3}"
 
 #make environment.sh executable so it
 #can be called by user or other scripts
-chmod +x $outdir/environment.sh 
+chmod +x $outdir/environment.sh
 
-#currently copying environment.sh into toplevel
-#directory with mchgen.sh
+# make any bash scripts executable
+# created with <script name = "filename"></script>
+for file in $outdir/*.sh
+do
+    if [[ -f $file ]]; then
+      chmod +x $file
+    fi
+done
