@@ -9,7 +9,11 @@
 .for machine.environment as environment
 .for environment.include as include
 .if include.system = "python3"
+.if include.url ?<> ""
+pip3 install $(include.url:)
+.else
 ok pip3 $(include.name:)
+.endif
 .endif
 .endfor
 .endfor
