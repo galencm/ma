@@ -17,6 +17,7 @@ import logging
 import logzero
 from logzero import logger
 import logzero
+import shutil
 logzero.logfile("/tmp/{}.log".format(os.path.basename(sys.argv[0])))
 #add logs option calling stderr
 #./nomad logs -stderr -address=http://192.168.0.155:4646 343beff9
@@ -186,8 +187,9 @@ def run_job(name,command,args,scheduler_binary=None,path=".jobs",tags=None,exter
         j = json.loads(job_json)
 
     if external_file:
-        #external_file = os.path.join(path,external_file)
         logger.info("loading job file: {}".format(external_file))
+        exfname = os.path.basename(external_file)
+        shutil.copyfile(external_file,os.path.join(path,'{}'.format(exfname)))
 
         if external_file.endswith('.hcl'):
             logger.info("converting .hcl to .json for submission")
