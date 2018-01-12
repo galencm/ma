@@ -17,6 +17,24 @@
 . endif
 . echo output_path
 
+.- Problem: key:value arguments
+.- This will not work for more than a few args since
+.- the name and pattern must be explicitly defined
+.- and the defined variable must be different from
+.- the variable in scope (ie interface_arg instead of
+.- interface).
+
+.define I = 0
+.while I < 10
+. if switches.arg$(I) ?<> ""
+. if string.prefixed(switches.arg$(I),"interface:")
+. define interface_arg = string.search_replace(switches.arg$(I),"interface:","")
+. endif
+. else
+. endif
+.I += 1
+.endwhile
+
 
 . dir = directory.create(output_path) ?
 .- echo file.copy('env_machine.bork',output_path+'env_machine.bork')
@@ -36,7 +54,12 @@
 .for machine.environment as environment
 .for environment.script as script
 . echo script.name
-.output "$(output_path)$(script.name)"
-$(script)
+. output "$(output_path)$(script.name)"
+.- Problem: unscalable keyword agument substition follows:
+. if interface_arg ?<> ""
+. script.interface = interface_arg
+. endif
+.- Problem: leading spaces from xml formatting are not trimmed
+. gsl script
 . endfor
 . endfor
