@@ -26,7 +26,8 @@ cd your_machine
 ```
 cd ma/machinic
 python3 machine.py status
-python3 machine.py status-raw
+python3 jobs.py status
+python3 jobs.py status-raw
 ```
 
 **(Re)generate yaml and permutations from xml:**
