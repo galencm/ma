@@ -156,7 +156,7 @@ def main():
     parser = argparse.ArgumentParser()
     #choice server|cli|list
 
-    parser.add_argument("mode", help="server|safer-server|cli|status|http", choices=['server','safer-server','cli','status','http'])
+    parser.add_argument("mode", help="server|safer-server|cli|status", choices=['server','safer-server','cli','status'])
 
     #parser.add_argument("-i", "--cli",action='store_true',help="interactive",required=False)
     #parser.add_argument("-s", "--server",action='store_true',help="server",required=False)
