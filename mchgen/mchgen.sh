@@ -46,7 +46,7 @@ cp environment.sh  $machine_dir
 cp helloworlds.py  $machine_dir
 cp machine.xml     $machine_dir
 cp .gitignore      $machine_dir
-cp boiler_README.md $machine_dir/README.md 
+cp ur_README.md $machine_dir/README.md 
 cp LICENSE         $machine_dir
 # basic tests
 cp local_tools.py $machine_dir
