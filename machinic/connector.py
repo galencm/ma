@@ -152,7 +152,6 @@ def list_services(service_name=None,return_format='stdout'):
 def main():
     """TODO docstring with argparse?
     """
-    parser = argparse.ArgumentParser()
     tutorial_string = textwrap.dedent("""
     Usage:
 
