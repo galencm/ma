@@ -26,20 +26,23 @@ aliases:
 .for source
 . new include
 . if source.type = "primitive_bytes"
-. define include.file = "source.py"
+. define include.file = "primitives-source-simple"
 . elsif source.type = "primitive_bytes_indexable"
-. define include.file = "source_indexable.py"
+. define include.file = "primitives-source-indexable"
 . endif 
-. define include.rpc = "false"
+. if (.wireup ?<> "")
+. define include.wireup = source.wireup
+. endif
+. define include.location = "path"
 . define include.name = source.location
-. define foo = xml.load_string("<argument>--source-name</argument>")
+. define foo = xml.load_string("<argument value = \"--source-name\" />")
 . copy foo to include
-. define foo = xml.load_string("<argument>$(source.location)</argument>")
+. define foo = xml.load_string("<argument value = \"$(source.location)\" />")
 . copy foo to include
 . if source.source = "boook"
-. define foo = xml.load_string("<argument>--source</argument>")
+. define foo = xml.load_string("<argument value=\"--source\" />")
 . copy foo to include
-. define foo = xml.load_string("<argument>boook</argument>")
+. define foo = xml.load_string("<argument value =\"boook\" />")
 . copy foo to include
 .endif
 
