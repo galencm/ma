@@ -37,7 +37,7 @@ aliases:
 . define include.name = source.location
 . define foo = xml.load_string("<argument value = \"--source-name\" />")
 . copy foo to include
-. define foo = xml.load_string("<argument value = \"$(source.location)\" />")
+. define foo = xml.load_string("<argument value = \"$( source.location:)\" />")
 . copy foo to include
 . if source.source = "boook"
 . define foo = xml.load_string("<argument value=\"--source\" />")
@@ -106,7 +106,7 @@ includes:
 .args+="]"
 .endif
 .if args ?<> ""
-    args: $(args)
+    args: $(args:)
 .endif
 . define I = 0
 . for check
