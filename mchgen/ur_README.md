@@ -12,7 +12,7 @@ git clone https://github.com/galencm/ma
 **(Re)generate control scripts from yaml:**
 ```
 cd ma/machinic
-python3 machine.py --name machine --file ~/your_machine/machine.yaml
+python3 machine.py generate --name machine --file ~/your_machine/machine.yaml
 ```
 
 **Start/stop machine(core machine must be running):**
