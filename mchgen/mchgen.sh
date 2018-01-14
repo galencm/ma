@@ -30,6 +30,7 @@ name=${1:-machine}
 : ${2?$(echo missing output destination path)$(exit 1)}
 machine_dir=$2
 mkdir $machine_dir
+mkdir $machine_dir/tests
 
 while getopts ':hs:' option; do
   case "$option" in
@@ -47,7 +48,15 @@ cp machine.xml     $machine_dir
 cp .gitignore      $machine_dir
 cp boiler_README.md $machine_dir/README.md 
 cp LICENSE         $machine_dir
+# basic tests
+cp local_tools.py $machine_dir
+cp conftest.py $machine_dir
+cp test_machine.py $machine_dir/tests
+
 #create empty AUTHORS file
-touch $machine_dir/AUTHORS   
+touch $machine_dir/AUTHORS 
+echo
+echo machine skeleton created in $machine_dir
+echo run included tests using \'pytest -v\'
 #replace paths from generic to machine name
-sed -i -e "s/machine_foo/$machine_dir/g" $machine_dir/README.md
+#sed -i -e "s/machine_foo/$machine_dir/g" $machine_dir/README.md
