@@ -20,8 +20,8 @@ from logzero import logger
 import attr
 import consul
 import inspect
-
 import logzero
+import textwrap
 try:
     logzero.logfile("/tmp/{}.log".format(os.path.basename(sys.argv[0])))
 except Exception as ex:
@@ -152,15 +152,46 @@ def list_services(service_name=None,return_format='stdout'):
 def main():
     """TODO docstring with argparse?
     """
-    #print(sys.argv)
     parser = argparse.ArgumentParser()
-    #choice server|cli|list
+    tutorial_string = textwrap.dedent("""
+    Usage:
 
+        Display discoverable services:
+
+        $ python3 connector.py status
+
+        Get a cmd2 prompt on a zerorpc server, connecting by name(for generated services):
+
+        $ python3 connector.py cli -s zerorpc-tools
+
+        Start a zerorpc server by wrapping a file:
+
+        $ python3 connector.py server --service-file tools.py --host 127.0.0.1 --port 4242
+
+        Connect to a zerorpc server with cmd2 prompt:
+
+        $ python3 connector.py cli --host 127.0.0.1 --port 4242
+
+
+
+        Notes:
+
+        Connector.py is typically used to wrap files by
+        using xml in a machine file:
+
+            <include file = "tools.py" name = "tools" rpc = "true" wireup = "true" />
+
+        Security:
+
+        This method of import everything is not recommended by zerorpc devs
+        and exposes more python functions than necessary(ie python os module
+        becomes available for rpc).
+        Check firewall rules...
+        Suggestions on this issue welcomed...
+
+    """)
+    parser = argparse.ArgumentParser(description=tutorial_string,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("mode", help="server|safer-server|cli|status", choices=['server','safer-server','cli','status'])
-
-    #parser.add_argument("-i", "--cli",action='store_true',help="interactive",required=False)
-    #parser.add_argument("-s", "--server",action='store_true',help="server",required=False)
-    #parser.add_argument("-l", "--list",action='store_true',help="list rpc servers",required=False)
     parser.add_argument("-s", "--service",help="connect <service> via lookup",required=False)
     parser.add_argument("--safe-service-file",help="server",required=False)
     parser.add_argument("--service-file",nargs='+',help="server",required=False,default=[])
@@ -224,7 +255,7 @@ def main():
                 args.host = l.ip
                 args.port = l.port
 
-        print("interactive connecting to {}:{}".format(args.host,args.port))
+        print("connecting to for interactive session {}:{}".format(args.host,args.port))
         cmdline_repl(args.host,args.port)
     elif args.mode == 'status':
         list_services()
