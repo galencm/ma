@@ -17,7 +17,6 @@ Currently a newly created outline consists of:
     machine.xml        xml specification for machine(pass to codegen.sh or ma)
     environment.xml    xml for machine environment(pass to envgen)
     environment.sh     entry to environment scripts usually in ./env
-    helloworlds.py     simple example to test or remove
     LICENSE            MPL 2.0, default
     AUTHORS            authors file, empty
     README.md          simple readme
@@ -43,7 +42,6 @@ shift $((OPTIND - 1))
 
 cp environment.xml $machine_dir
 cp environment.sh  $machine_dir
-cp helloworlds.py  $machine_dir
 cp machine.xml     $machine_dir
 cp .gitignore      $machine_dir
 cp ur_README.md $machine_dir/README.md 

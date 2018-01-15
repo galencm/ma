@@ -3,6 +3,13 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. 
    Copyright (c) the Contributors as noted in the AUTHORS file.-->
-<machine description="machine_helloworld">
-    <include file="helloworlds.py" duplicates="false"></include>
+<machine description = "">
+
+    <!-- includes -->
+    <!-- sequences -->
+    <!-- peripherals -->
+    <!-- sources -->
+    <!-- rules -->
+    <!-- ... -->
+
 </machine>
