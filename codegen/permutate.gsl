@@ -12,6 +12,11 @@
 . abort "argument 2 template directory required\nUsage:\ngsl -a -script:permutate.gsl [xml] [output_path] [template_directory]"
 . endif
 
+. define graph_title = ""
+. if switches.title ?<> ""
+. define graph_title = switches.title
+. endif
+
 . define output_path = switches.arg1
 . define template_dir = switches.arg2
 
@@ -82,4 +87,6 @@ DEST$(string.replace( string.replace(input.source,":|"), "/|")) -> $(argument.va
 . endfor
 
 . append "$(output_path)/permutations.dot"
+labelloc="t";
+label="$(graph_title)";
 }
