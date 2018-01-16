@@ -16,20 +16,63 @@
 . define template_dir = switches.arg2
 
 . dir = directory.create(output_path) ?
-
+. output "$(output_path)/permutations.dot"
+digraph permutations {
+node [weight = 0.25];
+nodesep=0.5
 . define I = 0
 . dir = directory.open (template_dir)
+. define real_source = "reality"
+$(real_source:)[label="$("reality")",color="red"]
+. for source
+$(source.location:)[label="$(source.location:)",color="red"]
+. endfor
 . for peripheral
+. define J = 0
 . echo peripheral.type
 . for dir.file as f
 . if regexp.match('^$(type).*gsl$',f.name) 
+. append "$(output_path)/permutations.dot"
+. define generating_file = string.replace(string.replace(f.name,".|_"),"-|_")
+$(string.replace(string.replace(f.name,".|_"),"-|_"))[label="$(f.name)", style="dotted",fontcolor="gray"]
+.if peripheral.name ?<> ""
+$(peripheral.name)[label="$(peripheral.name)\n$(peripheral.type)\n$(peripheral.source:)\n$(peripheral.method)"]
+.endif
+.if peripheral.source ?<> ""
+$(peripheral.source:) -> $(peripheral.name) [color="red"]
+.endif
+.if peripheral.source ?= ""
+$(real_source:) -> $(peripheral.name) [color="red"]
+.endif
+
+$(peripheral.type)$(J)$(I)[label="$(f.name)-$(I)"]
+$(generating_file) -> $(peripheral.type)$(J)$(I) [label="generates", style="dotted",fontcolor="gray"]
+. for peripheral.output
+DEST$(string.replace( string.replace(output.destination,":|"), "/|"))[label="$(output.destination:)"]
+$(peripheral.type)$(J)$(I) -> DEST$(string.replace( string.replace(output.destination,":|"), "/|")) [label="$(output.value:)"]
+. endfor
+. for peripheral.input
+. if input.filter ?<> ""
+$(input.filter) -> $(peripheral.type)$(J)$(I) [label="filter"]
+. endif
+. if input.source ?<> ""
+.-DEST$(string.replace( string.replace(input.source,":|"), "/|")) -> $(peripheral.type)$(J)$(I)
+. for input.call as call
+. for call.argument as argument
+DEST$(string.replace( string.replace(input.source,":|"), "/|")) -> $(argument.value) [label="$(call.value) $(argument.value)"]
+. endfor
+. endfor
+. endif
+. endfor
+. J += 1
 . echo template_dir+"/"+f.name
 .- gsl from "$(f.name)"
-
 . gsl from template_dir+"/"+"$(f.name)"
+
 . endif
 . endfor
 . I += 1
 . endfor
 
-
+. append "$(output_path)/permutations.dot"
+}
