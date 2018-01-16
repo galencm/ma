@@ -50,14 +50,19 @@ aliases:
 . endnew
 .endfor
 . for peripheral
+. echo "processing peripheral $(peripheral.type)"
 . for .input as input
 . if input.source ?<> ""
+. echo "input $(input.source)"
 . new route
 . define route.trigger = input.source
-. define route.call = "$(input -> call)"
+.- define route.call = "$(input -> call)"
+.- define below will fail with multiple calls in single input
+. define route.call = "$(input -> call.value)"
+. echo "call $(route.call)"
 .- if "$(input -> argument)" ?<> ""
 .-copy entire child not attribute!
-. copy input -> argument to route
+. copy input -> call -> argument to route
 .- endif 
 .move route to machine
 . endnew
