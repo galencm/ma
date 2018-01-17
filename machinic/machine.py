@@ -115,6 +115,9 @@ def generate_control_scripts(path,files,states,machine_name):
     #filename:multiple|single
     #hash wrapped contents?
     #zerorpc in tags
+    if files is None:
+        files =[]
+
     template_vars = {}
 
     template_vars['machine_path'] = path
