@@ -75,15 +75,22 @@ case "$outdir" in
 esac
 
 #generated files will go into 'env' directory
+rootdir=$outdir
 outdir+="/env/"
 echo $outdir
 
-# clear scripts generated from <script></script>
+# clear previous scripts generated
+# from <script></script>
+# prior to regenerating
+#
 # for file in  $outdir/*.sh
 # do
 #    case "$file" in
 #      *environment.sh* ) continue;;
-#      * ) rm $file;;
+#      * )
+#         echo "cleaning $file"
+#         rm $file
+#       ;;
 #    esac
 # done
 
@@ -96,7 +103,8 @@ chmod +x $outdir/environment.sh
 
 # make any bash scripts executable
 # created with <script name = "filename"></script>
-for file in $outdir/*.sh
+echo $rootdir
+for file in $outdir/*.sh $rootdir/*.sh
 do
     if [[ -f $file ]]; then
       chmod +x $file
