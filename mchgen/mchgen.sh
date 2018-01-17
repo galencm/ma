@@ -5,22 +5,27 @@
 #
 # Copyright (c) 2017, Galen Curwen-McAdams
 
-usage="Usage:  $0 [name] [destination path/directory]
+usage="Usage:  [name] [destination path/directory]
 
 Example: 
     ./mchgen.sh foo ~/machine_foo
+
 produces the output:
                       ~/machine_foo
                       ~/machine_foo/<files>
+                      ~/machine_foo/tests/<files>
 
 Currently a newly created outline consists of:
-    machine.xml        xml specification for machine(pass to codegen.sh or ma)
-    environment.xml    xml for machine environment(pass to envgen)
-    environment.sh     entry to environment scripts usually in ./env
-    LICENSE            MPL 2.0, default
-    AUTHORS            authors file, empty
-    README.md          simple readme
-    .gitignore         ignores generated scripts and python cache files
+    machine.xml                xml specification for machine(pass to codegen.sh or ma)
+    environment.xml            xml for machine environment(pass to envgen)
+    environment.sh             entry to environment scripts usually in ./env
+    LICENSE                    MPL 2.0, default
+    AUTHORS                    authors file, empty
+    README.md                  simple readme
+    .gitignore                 ignores generated scripts and python cache files
+    conftest.py                basic self-testing configuration
+    local_tools.py             used by tests to discover machine services
+    ./tests/test_machine.py    basic self-tests using pytest
 "
 # show usage if run without arguments
 : ${1?"$usage"}

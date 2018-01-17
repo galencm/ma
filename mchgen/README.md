@@ -1,6 +1,6 @@
 # Mchgen
 
-Generate a machine outline with files and directory structure. Defaults with a simple hello world accessible via rpc.
+Generate a machine outline. 
 
 A newly created outline consists of:
 
@@ -9,37 +9,68 @@ A newly created outline consists of:
 |`machine.xml`      |    xml specification for machine |            
 |`environment.xml`  |    xml for machine environment   | 
 |`environment.sh`   |    entry to environment scripts usually in ./env |
-|`helloworlds.py`   |    simple example to test or remove |
 |`LICENSE`          |    MPL 2.0, default |
 |`AUTHORS`          |    authors file, empty |
 |`README.md`        |    simple readme |
-|`gitignore`        |    ignores common generated files |
+|`.gitignore`       |    ignores common generated files |
+|`conftest.py`      |    basic self-testing configuration |
+|`local_tools.py`   |    used by tests to discover machine services |
+|`./tests/test_machine.py` |   basic self-tests using pytest |
 
 
-### Usage:  
+## Usage:  
 
-`./mchgen.sh [machine name]`
+`./mchgen.sh [machine name] [output directory]`
 
-### Example:
+## Example:
 
-`./mchgen.sh foo`
+Get `ma`:
+```
+git clone https://github.com/galencm/ma
+```
 
-produces:
+Create a new machine and initialize git:
+```
+cd ~/ma/mchgen
+./mchgen.sh ~/machine_foo
+cd ~/machine_foo
+git init .
+git add .
+git commit -m "Problem: machine has no source control
 
-    `../machine_foo`
+Solution: use git"
+```
 
-    `../machine_foo/<files>`
+(Re)generate environment:
+```
+cd ~/ma/envgen
+./envgen.sh ~/machine_foo/environment.xml ~/machine_foo/
+```
 
-### Running the Example
+(Re)generate with codegen and machine.py:
+```
+cd ~/machine_foo
+./regenerate.sh
+```
 
-`./ma.sh machine_foo machine_foo ./machine_foo/machine.xml`
+Start machine:
+```
+cd ~/machine_foo
+./start.sh
+```
 
-##  <a name="contribute"></a> Contributing
+Run self-tests:
+```
+pytest -v
+```
+
+## Contributing
 This project uses the C4 process 
 
-https://rfc.zeromq.org/spec:42/C4/
+[https://rfc.zeromq.org/spec:42/C4/](https://rfc.zeromq.org/spec:42/C4/
+)
 
-##  <a name="license"></a> License
+## License
 Mozilla Public License, v. 2.0
 
 [http://mozilla.org/MPL/2.0/](http://mozilla.org/MPL/2.0/)
