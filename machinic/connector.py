@@ -190,10 +190,10 @@ def main():
 
     """)
     parser = argparse.ArgumentParser(description=tutorial_string,formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("mode", help="server|safer-server|cli|status", choices=['server','safer-server','cli','status'])
+    parser.add_argument("mode", help="server|cli|status", choices=['server','cli','status'])
     parser.add_argument("-s", "--service",help="connect <service> via lookup",required=False)
-    parser.add_argument("--safe-service-file",help="server",required=False)
     parser.add_argument("--service-file",nargs='+',help="server",required=False,default=[])
+    parser.add_argument("--class-file",action="store_true")
     parser.add_argument("--host", help="host ip",default="127.0.0.1", required=False)
     parser.add_argument("-p", "--port", help="port number",default="4242", required=False)
 
@@ -202,48 +202,74 @@ def main():
     print(args.mode)
 
     if args.mode == 'server':
-        services = []
-        for f in args.service_file:
-            #add path for loading python files from different
-            path = os.path.dirname(os.path.abspath(f))
-            sys.path.insert(0, path)
-            logger.info("Added {} to sys.path".format(f))
+        # assumes that filename without extension 
+        # and classname in file match
+        if args.class_file is True:
+            safer_module_class = None
+            for f in args.service_file:
+                #add path for loading python files from different
+                path = os.path.dirname(os.path.abspath(f))
+                sys.path.insert(0, path)
+                logger.info("Added {} to sys.path".format(f))
 
-            if f.endswith('.py'):
-                f = os.path.basename(f)
-                f = f[:-3]
-                logger.info("Using {} to load as module".format(f))
+                if f.endswith('.py'):
+                    f = os.path.basename(f)
+                    f = f[:-3]
+                    logger.info("Using {} to load as module".format(f))
 
-            try:
-                module = importlib.import_module(f)
-                print(module)
-                services.extend([k for (k, v) in module.__dict__.items() if not k.startswith('_')])
+                try:
+                    module = importlib.import_module(f)
+                    safer_module_class = f
+                except Exception as ex:
+                    logger.error(ex)
 
-                globals().update(
-                    {n: getattr(module, n) for n in module.__all__} if hasattr(module, '__all__') 
-                    else 
-                    {k: v for (k, v) in module.__dict__.items() if not k.startswith('_')
-                })
-            except Exception as ex:
-                logger.error(ex)
+            # load class from module using string
+            module_to_load = getattr(module, safer_module_class)
+            logger.info("Using {} to load as class".format(safer_module_class))
+            
+            s = zerorpc.Server(module_to_load())
+            bind_address = "tcp://{host}:{port}".format(host=args.host,port=args.port)
+            logger.info("binding server to: {}".format(bind_address))
+            s.bind(bind_address)
+            logger.info("running...")
+            s.run()
+        else:
+            services = []
+            for f in args.service_file:
+                #add path for loading python files from different
+                path = os.path.dirname(os.path.abspath(f))
+                sys.path.insert(0, path)
+                logger.info("Added {} to sys.path".format(f))
 
-        logger.info(services)
-        a = wrap(services)
+                if f.endswith('.py'):
+                    f = os.path.basename(f)
+                    f = f[:-3]
+                    logger.info("Using {} to load as module".format(f))
 
-        s = zerorpc.Server(a)
-        bind_address = "tcp://{host}:{port}".format(host=args.host,port=args.port)
-        logger.info("binding server to: {}".format(bind_address))
-        s.bind(bind_address)
-        logger.info("running...")
-        s.run()
-    # if args.mode == 'safer-server':
-        
-    #     s = zerorpc.Server(a)
-    #     bind_address = "tcp://{host}:{port}".format(host=args.host,port=args.port)
-    #     logger.info("binding server to: {}".format(bind_address))
-    #     s.bind(bind_address)
-    #     logger.info("running...")
-    #     s.run()
+                try:
+                    module = importlib.import_module(f)
+                    print(module)
+                    services.extend([k for (k, v) in module.__dict__.items() if not k.startswith('_')])
+
+                    globals().update(
+                        {n: getattr(module, n) for n in module.__all__} if hasattr(module, '__all__') 
+                        else 
+                        {k: v for (k, v) in module.__dict__.items() if not k.startswith('_')
+                    })
+                except Exception as ex:
+                    logger.error(ex)
+
+            logger.info(services)
+            a = wrap(services)
+
+            # TODO fix RpcWrapper problems
+            # this code is same as above in --class-file..
+            s = zerorpc.Server(a)
+            bind_address = "tcp://{host}:{port}".format(host=args.host,port=args.port)
+            logger.info("binding server to: {}".format(bind_address))
+            s.bind(bind_address)
+            logger.info("running...")
+            s.run()
 
     elif args.mode == 'cli':
         if args.service:
