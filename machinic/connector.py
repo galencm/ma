@@ -249,7 +249,7 @@ def main():
                 try:
                     module = importlib.import_module(f)
                     print(module)
-                    services.extend([k for (k, v) in module.__dict__.items() if not k.startswith('_')])
+                    services.extend([k for (k, v) in module.__dict__.items() if not k.startswith('_') and callable(module.__dict__[k])])
 
                     globals().update(
                         {n: getattr(module, n) for n in module.__all__} if hasattr(module, '__all__') 
