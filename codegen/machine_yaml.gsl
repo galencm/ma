@@ -71,7 +71,7 @@ aliases:
 . endfor
 includes:
 . for include
- - $(include.file):
+ - $(include.file:):
 . if (.duplicates ?= "true" | .duplicates ?= "false")
     allow-duplicates: $(include.duplicates:Neat)
 . endif    
