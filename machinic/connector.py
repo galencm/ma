@@ -193,7 +193,7 @@ def main():
     parser.add_argument("mode", help="server|cli|status", choices=['server','cli','status'])
     parser.add_argument("-s", "--service",help="connect <service> via lookup",required=False)
     parser.add_argument("--service-file",nargs='+',help="server",required=False,default=[])
-    parser.add_argument("--class-file",action="store_true")
+    parser.add_argument("--service-class", help="class from file containing functions to serve via rpc")
     parser.add_argument("--host", help="host ip",default="127.0.0.1", required=False)
     parser.add_argument("-p", "--port", help="port number",default="4242", required=False)
 
@@ -202,10 +202,8 @@ def main():
     print(args.mode)
 
     if args.mode == 'server':
-        # assumes that filename without extension 
-        # and classname in file match
-        if args.class_file is True:
-            safer_module_class = None
+        if args.service_class:
+            module_class = None
             for f in args.service_file:
                 #add path for loading python files from different
                 path = os.path.dirname(os.path.abspath(f))
@@ -219,13 +217,13 @@ def main():
 
                 try:
                     module = importlib.import_module(f)
-                    safer_module_class = f
+                    module_class = args.service_class
                 except Exception as ex:
                     logger.error(ex)
 
             # load class from module using string
-            module_to_load = getattr(module, safer_module_class)
-            logger.info("Using {} to load as class".format(safer_module_class))
+            module_to_load = getattr(module, module_class)
+            logger.info("Using {} to load as class".format(module_class))
             
             s = zerorpc.Server(module_to_load())
             bind_address = "tcp://{host}:{port}".format(host=args.host,port=args.port)

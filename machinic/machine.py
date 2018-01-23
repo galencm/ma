@@ -139,8 +139,10 @@ def generate_control_scripts(path,files,states,machine_name):
     #unwrapped .py
     #.hcl
     for file in files:
+        logger.error("...........{}".format(file))
         #serve with zerorpc
         rpc = False
+        use_class = None
         #--host --port supplied by nomad
         default_connectivity = False
         args = []
@@ -148,25 +150,32 @@ def generate_control_scripts(path,files,states,machine_name):
         for filename,params in file.items():
             if filename.endswith(".hcl"):
                 rpc = False
+
             try:
                 if params['as-rpc'] is False:
                     rpc = False
                 elif params['as-rpc'] is True:
                     rpc = True
             except Exception as ex:
-                pass
+                logger.warn(ex)
 
             try:
                 if params['args']:
                     args = params['args']
             except Exception as ex:
-                pass
+                logger.warn(ex)
+
+            try:
+                args.extend(["--service-class", params['use-class']])
+            except KeyError as ex:
+                logger.warn(ex)
 
             try:
                 if params['location']:
                     location = params['location']
             except Exception as ex:
                 location = False
+                logger.warn(ex)
 
             try:
                 if params['auto-wireup'] is False:

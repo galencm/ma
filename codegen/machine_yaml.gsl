@@ -33,6 +33,9 @@ aliases:
 . if (.wireup ?<> "")
 . define include.wireup = source.wireup
 . endif
+. if (.class ?<> "")
+. define include.class = source.class
+. endif
 . define include.location = "path"
 . define include.name = source.location
 . define foo = xml.load_string("<argument value = \"--source-name\" />")
@@ -80,7 +83,10 @@ includes:
 . endif  
 . if (.rpc ?= "true" | .rpc ?= "false")
     as-rpc: $(include.rpc:Neat)
-. endif  
+. endif
+. if (.class ?<> "")
+    use-class: $(include.class:)
+. endif
 . if (.location ?<> "")
     location: $(include.location:)
 . endif  
