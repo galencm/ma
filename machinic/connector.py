@@ -32,10 +32,8 @@ def add_self(f):
     """
     @wraps(f)
     def wrapped(self, *f_args, **f_kwargs):
-        #return f(self,*f_args,**f_kwargs) # 
         print(inspect.getfullargspec(f))
-        return f(*f_args,**f_kwargs) # looking up ['redis and things']
-        #return f(f_args,f_kwargs) # looking up (['redis'],)
+        return f(*f_args,**f_kwargs)
     return wrapped
 
 
@@ -45,9 +43,9 @@ def wrap(to_wrap):
     rpcw = RpcWrapper()
     for f in to_wrap:
         print("adding ",f)
-        #setattr(RpcWrapper, f, classmethod(globals()[f]))
+        # Problem: function signature is not correct
+        # zerorpc shows only: [{'name': 'self'}]
         setattr(rpcw, f, types.MethodType(add_self(globals()[f]), rpcw ))
-        #setattr(rpcw, f, types.MethodType(add_self(globals()[f]), rpcw ))
 
     return rpcw
 
@@ -55,11 +53,6 @@ class RpcWrapper(object):
     """Container object for zerorpc, services(functions) are provided
     as a list and dynamically added.
     """
-    #def __init__(self):
-    #    r.sadd('rpc_services',)
-
-    #def lookup(self,service):
-    #    return lookup_rpc(service)
 
 class CmdLineApp(Cmd):
     """Given a host and port attempts to connect as client to zerorpc
@@ -127,8 +120,6 @@ class ServiceLookup():
         """return ip:port for templates
         """
         return "{ip}:{port}".format(ip=self.ip,port=self.port)
-    
-
 
 def list_services(service_name=None,return_format='stdout'):
     c = consul.Consul()
@@ -214,7 +205,6 @@ def main():
                     f = os.path.basename(f)
                     f = f[:-3]
                     logger.info("Using {} to load as module".format(f))
-
                 try:
                     module = importlib.import_module(f)
                     module_class = args.service_class
