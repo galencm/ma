@@ -277,8 +277,10 @@ def generate_control_scripts(path,files,states,machine_name):
 
         make_executable.append(script_name)
 
-    for f,job,_,_,_,_ in named_files:
-        make_executable.append(f)
+    for f,job,rpc,_,_,_ in named_files:
+        # do not make rpc files executable
+        if not rpc:
+            make_executable.append(f)
 
     for file in make_executable:
         file_path = os.path.join(path,file)
