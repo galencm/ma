@@ -32,10 +32,15 @@ def main(argv):
     parser.add_argument("state", help="")
     parser.add_argument("key", help="")
     parser.add_argument("value", help="")
+    parser.add_argument("--raw-state", action='store_true', help="use state as key without any prefix")
     args = parser.parse_args()
     if args.action == "set":
-        logger.info("{} 'state:{}' -> '{}' to {}".format(args.action, args.state, args.key, args.value))
-        r.hmset("state:{}".format(args.state),{args.key:args.value})
+        if args.raw_state:
+            r.hmset("{}".format(args.state),{args.key:args.value})
+            logger.info("{} '{}' -> '{}' to {}".format(args.action, args.state, args.key, args.value))
+        else:
+            r.hmset("state:{}".format(args.state),{args.key:args.value})
+            logger.info("{} 'state:{}' -> '{}' to {}".format(args.action, args.state, args.key, args.value))
 
 if __name__ == "__main__":
     main(sys.argv)

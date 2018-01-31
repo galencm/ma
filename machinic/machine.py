@@ -104,11 +104,24 @@ def parse_machine_file(name,clear_before_start,machine_file):
         except TypeError:
             pass
 
+        logger.info("State:")
+        states = []
+        try:
+            for state in machine_outline['state']:
+                name = list(state)[0]
+                key = state[name]['type'] + ":" + name
+                for set_pls in state[name]['set']:
+                    for k, v in set_pls.items():
+                        states.append((key, k, v))
+        except TypeError as ex:
+            logger.error(ex)
+            pass
+
     except Exception as ex:
         logger.warn(ex)
-    generate_control_scripts(os.path.abspath(machine_path),machine_outline['includes'],machine_outline['set'],name)
+    generate_control_scripts(os.path.abspath(machine_path), machine_outline['includes'], machine_outline['set'], states, name)
 
-def generate_control_scripts(path,files,states,machine_name):
+def generate_control_scripts(path,files,sets,states,machine_name):
     #check for name collisions
     #if collision append -1,2etc..
     #difficult, may not want always want duplicates
@@ -121,7 +134,9 @@ def generate_control_scripts(path,files,states,machine_name):
     template_vars = {}
 
     template_vars['machine_path'] = path
+    template_vars['sets'] = sets
     template_vars['states'] = states
+    logger.error(template_vars['states'])
     if not template_vars['machine_path'].endswith("/"):
         template_vars['machine_path']+="/"
 
@@ -229,13 +244,18 @@ def generate_control_scripts(path,files,states,machine_name):
     lings-route-add --file ${MACHINE_PATH}routes-{{machine_name}}.txt
     lings-pipe-add --file ${MACHINE_PATH}pipes-{{machine_name}}.txt
     lings-rule-add --file ${MACHINE_PATH}rules-{{machine_name}}.txt
-    {% if states is not none -%}
-    {% for k,v in states[0].items() -%}
-    {% for state in v -%}
-    {% for sk,sv in state.items() %}
+    {% if sets is not none -%}
+    {% for k,v in sets[0].items() -%}
+    {% for set_state in v -%}
+    {% for sk,sv in set_state.items() %}
     python3 ${JOB_PATH}state set {{k}} {{sk}} {{sv}}
     {%- endfor -%}
     {%- endfor -%}
+    {%- endfor -%}
+    {%- endif %}
+    {% if states is not none -%}
+    {% for name, symbol, value in states -%}
+    python3 ${JOB_PATH}state set {{name}} {{symbol}} {{value}} --raw-state
     {%- endfor -%}
     {%- endif %}
 

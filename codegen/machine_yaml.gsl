@@ -236,3 +236,11 @@ set:
    - $(set.symbol:):$(set.peripheral:): $(set.value:)
 .endfor
 .endfor
+
+state:
+.for state
+ - $(state.name:):
+    type: $(state.type)
+    set:
+      - $(state.symbol:): $(state.value:)
+.endfor
