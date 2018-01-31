@@ -229,12 +229,6 @@ rules:
  - [$(pattern.name),$(rulestring)]
 .endfor
 
-.-can set and prepare be combined?
-prepare:
-.for prepare
- - $(prepare.file)
-.endfor
-
 set:
 .for source
  - $(source.location:):
