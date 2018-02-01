@@ -108,9 +108,9 @@ def parse_machine_file(name,clear_before_start,machine_file):
         states = []
         try:
             for state in machine_outline['state']:
-                name = list(state)[0]
-                key = state[name]['type'] + ":" + name
-                for set_pls in state[name]['set']:
+                state_name = list(state)[0]
+                key = state[state_name]['type'] + ":" + state_name
+                for set_pls in state[state_name]['set']:
                     for k, v in set_pls.items():
                         states.append((key, k, v))
         except TypeError as ex:
