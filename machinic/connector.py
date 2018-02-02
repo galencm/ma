@@ -45,6 +45,7 @@ def wrap(to_wrap):
         print("adding ",f)
         # Problem: function signature is not correct
         # zerorpc shows only: [{'name': 'self'}]
+        # wrapt module may be solution instead of wraps
         setattr(rpcw, f, types.MethodType(add_self(globals()[f]), rpcw ))
 
     return rpcw
@@ -215,7 +216,7 @@ def main():
             module_to_load = getattr(module, module_class)
             logger.info("Using {} to load as class".format(module_class))
             
-            s = zerorpc.Server(module_to_load())
+            s = zerorpc.Server(module_to_load(), heartbeat=60)
             bind_address = "tcp://{host}:{port}".format(host=args.host,port=args.port)
             logger.info("binding server to: {}".format(bind_address))
             s.bind(bind_address)
