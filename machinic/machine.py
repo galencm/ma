@@ -255,7 +255,7 @@ def generate_control_scripts(path,files,sets,states,machine_name):
     {%- endif %}
     {% if states is not none -%}
     {% for name, symbol, value in states -%}
-    python3 ${JOB_PATH}state set {{name}} {{symbol}} {{value}} --raw-state
+    python3 ${JOB_PATH}state set {{name}} "{{symbol}}" "{{value}}" --raw-state
     {%- endfor -%}
     {%- endif %}
 
