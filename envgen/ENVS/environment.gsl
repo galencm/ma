@@ -26,7 +26,7 @@ echo "$available"
 # add type for pip3, included inline
 
 pip3_type='
-### exact copy of bork project's pip.sh by Matthew Lyon     ###
+### exact copy of bork projects pip.sh by Matthew Lyon     ###
 ### except with 'pip3' replacing 'pip', see:                ###
 ### https://github.com/mattly/bork/blob/master/types/pip.sh ###
 
