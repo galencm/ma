@@ -34,10 +34,10 @@ for filename in *; do
         *) ;;
       esac
       ;;
-      *.sh)
-            echo "including $filename"
-            include $filename
-      ;;
+      # *.sh)
+      #       echo "including $filename"
+      #       include $filename
+      # ;;
       *.bork)  
             echo "including $filename"
             include $filename
