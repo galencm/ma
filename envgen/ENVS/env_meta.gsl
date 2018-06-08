@@ -24,6 +24,7 @@ echo $OS_NAME
 for filename in *; do
   case "$filename" in
       $SCRIPT_NAME) echo "ignoring self";;
+      "environment.sh") echo "ignoring environment.sh to avoid recursion";;
       *_os_*) 
       case "$filename" in 
         *$OS_NAME*)  
