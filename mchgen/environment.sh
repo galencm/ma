@@ -51,8 +51,8 @@ if [[ $available == 1 ]]
 fi
 
 #if pip3 type does not exist add
-if [ ! -f /usr/local/src/bork/types/pip33.sh ]; then
-    echo "$pip3_type" | sudo tee /usr/local/src/bork/types/pip33.sh
+if [ ! -f /usr/local/src/bork/types/pip3.sh ]; then
+    echo "$pip3_type" | sudo tee /usr/local/src/bork/types/pip3.sh
 fi
 
 if [[ $available == 0 ]]
