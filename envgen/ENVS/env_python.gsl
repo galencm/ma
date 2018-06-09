@@ -10,7 +10,7 @@
 .for environment.include as include
 .if include.system = "python3"
 .if include.url ?<> ""
-ok pip3 --url=$(include.url:)
+ok pip3 $(include.name:) --url=$(include.url:)
 .else
 ok pip3 $(include.name:)
 .endif
