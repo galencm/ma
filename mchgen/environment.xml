@@ -33,6 +33,12 @@
             command="make install"
             />
 
+    <!-- filesystem operations -->
+    <!--
+    <include name="~/some_dir" system="directory" />
+    <include name="/var/some_dir" system="directory" user="root"/>
+    -->
+
     <script name = "../regenerate.sh">
         #!/bin/bash
         #set machine dir ie .
