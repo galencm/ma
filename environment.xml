@@ -6,7 +6,10 @@
 
 <machine>
 <environment name="ma">
-    
+    <include name="mesa-libGL-devel" system="dnf" />
+    <include name="libgl1-mesa-dev" system="apt" />
+
+
     <!-- python packages -->
     <include name="logzero" system="python3"/>
     <include name="redis" system="python3"/>
@@ -20,7 +23,8 @@
     <include name="python-consul" system="python3" />
     <include name="zerorpc" system="python3" />
     <include name="Pillow" system="python3" />
-    <include name="kivy" system="python3" />
+    <include name="Cython==0.26.1" system="python3" />
+    <include name="Kivy" system="python3" />
 
     <!-- scripts -->
     <script name = "../regenerate.sh">
