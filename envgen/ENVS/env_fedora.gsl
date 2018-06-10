@@ -11,7 +11,7 @@
 .for machine.environment as environment
 .for environment.include as include
 .if include.system = "dnf"
-ok yum $(include.name)
+ok yum $(include.name:)
 .endif
 .endfor
 .endfor
