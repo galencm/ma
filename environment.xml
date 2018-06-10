@@ -8,7 +8,8 @@
 <environment name="ma">
     <include name="mesa-libGL-devel" system="dnf" />
     <include name="libgl1-mesa-dev" system="apt" />
-
+    <include name="gcc" system="dnf" />
+    <include name="gcc" system="apt" />
 
     <!-- python packages -->
     <include name="logzero" system="python3"/>
