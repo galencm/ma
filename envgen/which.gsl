@@ -4,15 +4,15 @@
 .for environment.include as include
 .if include.system = architecture
 
-which $(include.name)
+which $(include.name:)
 #0: found 1:not found
 available=$?
 if [[ $available == 1 ]]
     then
 . if include.command = "local copy"
-    sudo cp $(include.url) (include.destination)
+    sudo cp $(include.url:) (include.destination:)
 . else
-    echo $(include.name) not found installing 
+    echo $(include.name:) not found installing
     wget -P /tmp $(include.url:)
 .define ext = string.substr(include.url,string.length(include.url)-3)
 .define dl_file = string.substr(include.url,string.locate_last(include.url,'/')+1,(string.length(include.url)))
@@ -22,13 +22,13 @@ if [[ $available == 1 ]]
 . if ext = ".gz"
 .define dl_dir = string.substr(include.url,string.locate_last(include.url,'/')+1,(string.length(include.url)-8))
 . echo dl_dir
-    (cd /tmp ; tar xvf /tmp/$(dl_file))
+    (cd /tmp ; tar xvf /tmp/$(dl_file:))
 .elsif ext = "zip"
 .define dl_dir = string.substr(include.url,string.locate_last(include.url,'/')+1,(string.length(include.url)-5))
-    unzip /tmp/$(dl_file) -d /tmp
+    unzip /tmp/$(dl_file:) -d /tmp
 .elsif include.fileformat = "zip"
 .define dl_dir = string.substr(include.url,string.locate_last(include.url,'/')+1,(string.length(include.url)))
-    unzip /tmp/$(dl_file) -d /tmp
+    unzip /tmp/$(dl_file:) -d /tmp
 .endif
 .-TODO throws error if an command is not included in xml
     #installs to /usr/local/bin
@@ -36,22 +36,22 @@ if [[ $available == 1 ]]
 . if include.expanded_directory ?<> ""
 . define dl_dir = include.expanded_directory
 .endif
-    (cd /tmp/$(dl_dir)/ ; make ; sudo make install)
+    (cd /tmp/$(dl_dir:)/ ; make ; sudo make install)
 .elsif include.command = 'copy install nodir'
 . if include.expanded_directory ?<> ""
 . define dl_dir = include.expanded_directory
 .endif
-    (cd /tmp/ ; sudo cp $(include.file) /usr/local/bin)
+    (cd /tmp/ ; sudo cp $(include.file:) /usr/local/bin)
 .endif
 .for raw
-    $(raw.line)
+    $(raw.line:)
 .endfor
 .-endif for local copy or else
 .endif
 fi
 
 if [[ $available == 0 ]]
-    then echo $(include.name) found 
+    then echo $(include.name:) found
 fi
 
 .endif
