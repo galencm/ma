@@ -8,6 +8,7 @@
 <environment name="ma">
     <include name="mesa-libGL-devel" system="dnf" />
     <include name="libgl1-mesa-dev" system="apt" />
+    <include name="redhat-rpm-config" system="dnf" />
     <include name="gcc" system="dnf" />
     <include name="gcc" system="apt" />
 
