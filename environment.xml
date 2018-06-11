@@ -46,6 +46,19 @@
     <include name="Cython==0.26.1" system="python3" />
     <include name="Kivy" system="python3" />
 
+    <include name="gsl"
+            system="linux_amd64"
+            url="https://github.com/zeromq/gsl/archive/master.zip"
+            expanded_directory="gsl-master"
+            command="make install"
+            />
+    <include name="gsl"
+            system="linux_arm"
+            url="https://github.com/zeromq/gsl/archive/master.zip"
+            expanded_directory="gsl-master"
+            command="make install"
+            />
+
     <!-- scripts -->
     <script name = "../regenerate.sh">
         #!/bin/bash

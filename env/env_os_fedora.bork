@@ -19,6 +19,24 @@ ok yum SDL2_image-devel
 ok yum SDL2_ttf-devel
 
 
+which gsl
+#0: found 1:not found
+available=$?
+if [[ $available == 1 ]]
+    then
+    echo gsl not found installing
+    wget -P /tmp https://github.com/zeromq/gsl/archive/master.zip --backups=1
+
+    unzip /tmp/master.zip -d /tmp
+    #installs to /usr/local/bin
+    (cd /tmp/gsl-master/ ; make ; sudo make install)
+fi
+
+if [[ $available == 0 ]]
+    then echo gsl found
+fi
+
+
 
 
 
