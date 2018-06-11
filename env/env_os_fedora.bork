@@ -11,6 +11,12 @@ ok yum redhat-rpm-config
 ok yum gcc
 ok yum gcc-c++
 ok yum python3-devel
+ok yum feh
+ok yum graphviz
+ok yum ImageMagick
+ok yum SDL2-devel
+ok yum SDL2_image-devel
+ok yum SDL2_ttf-devel
 
 
 

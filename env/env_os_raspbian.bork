@@ -10,6 +10,12 @@ ok apt libgl1-mesa-dev
 ok apt gcc
 ok apt g++
 ok apt python3-dev
+ok apt feh
+ok apt graphviz
+ok apt imagemagick
+ok apt libsdl2-dev
+ok apt libsdl2-image-dev
+ok apt libsdl2-ttf-dev
 
 
 

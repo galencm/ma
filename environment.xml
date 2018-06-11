@@ -15,6 +15,20 @@
     <include name="g++" system="apt" />
     <include name="python3-devel" system="dnf" />
     <include name="python3-dev" system="apt" />
+    <include name="feh" system="dnf" />
+    <include name="feh" system="apt" />
+    <include name="graphviz" system="dnf" />
+    <include name="graphviz" system="apt" />
+    <include name="ImageMagick" system="dnf" />
+    <include name="imagemagick" system="apt" />
+    <!-- kivy specific -->
+    <include name="SDL2-devel" system="dnf" />
+    <include name="libsdl2-dev " system="apt" />
+    <include name="SDL2_image-devel" system="dnf" />
+    <include name="libsdl2-image-dev" system="apt" />
+    <include name="SDL2_ttf-devel" system="dnf" />
+    <include name="libsdl2-ttf-dev" system="apt" />
+    <include name="pygame" system="python3" />
 
     <!-- python packages -->
     <include name="logzero" system="python3"/>
