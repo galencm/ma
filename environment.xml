@@ -20,7 +20,7 @@
     <include name="cmd2" system="python3"/>
     <include name="Jinja2" system="python3"/>
     <!-- codegen primitives python packages -->
-    <include name="paho.mqtt" system="python3"/>
+    <include name="paho-mqtt" system="python3"/>
     <include name="curtsies" system="python3"/>
     <include name="python-consul" system="python3" />
     <include name="zerorpc" system="python3" />

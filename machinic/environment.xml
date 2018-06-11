@@ -6,7 +6,7 @@
     -->
     <!-- python packages -->
     <include name="zerorpc" system="python3"/>
-    <include name="paho.mqtt" system="python3" />
+    <include name="paho-mqtt" system="python3" />
     <include name="python-consul" system="python3" />
     <include name="cmd2" system="python3" />
     <include name="redis" system="python3" />

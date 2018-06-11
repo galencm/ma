@@ -11,7 +11,7 @@ ok pip3 pytest
 ok pip3 ruamel.yaml
 ok pip3 cmd2
 ok pip3 Jinja2
-ok pip3 paho.mqtt
+ok pip3 paho-mqtt
 ok pip3 curtsies
 ok pip3 python-consul
 ok pip3 zerorpc
