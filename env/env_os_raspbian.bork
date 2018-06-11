@@ -8,6 +8,8 @@
 
 ok apt libgl1-mesa-dev
 ok apt gcc
+ok apt g++
+ok apt python3-dev
 
 
 

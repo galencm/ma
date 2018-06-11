@@ -11,6 +11,10 @@
     <include name="redhat-rpm-config" system="dnf" />
     <include name="gcc" system="dnf" />
     <include name="gcc" system="apt" />
+    <include name="gcc-c++" system="dnf" />
+    <include name="g++" system="apt" />
+    <include name="python3-devel" system="dnf" />
+    <include name="python3-dev" system="apt" />
 
     <!-- python packages -->
     <include name="logzero" system="python3"/>

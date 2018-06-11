@@ -9,6 +9,8 @@
 ok yum mesa-libGL-devel
 ok yum redhat-rpm-config
 ok yum gcc
+ok yum gcc-c++
+ok yum python3-devel
 
 
 
