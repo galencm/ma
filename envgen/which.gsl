@@ -13,7 +13,7 @@ if [[ $available == 1 ]]
     sudo cp $(include.url:) (include.destination:)
 . else
     echo $(include.name:) not found installing
-    wget -P /tmp $(include.url:)
+    wget -P /tmp $(include.url:) --backups=1
 .define ext = string.substr(include.url,string.length(include.url)-3)
 .define dl_file = string.substr(include.url,string.locate_last(include.url,'/')+1,(string.length(include.url)))
 . echo dl_file
