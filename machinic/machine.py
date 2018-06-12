@@ -223,12 +223,25 @@ def generate_control_scripts(path,files,sets,states,machine_name):
     MACHINE_PATH="{{machine_path}}"
     JOB_PATH="{{job_path}}/"
     CORE_PATH="{{core_path}}/"
-        
-    # prepare machine environment
-    #(check & install if necessary)
     
-    # add flag --no-env
-    ./environment.sh
+    # --with-env flag:
+    #     prepare machine environment
+    #     (check & install if necessary)
+    with_environment=false
+    while [[ $# -gt 0 ]]
+    do
+    key="$1"
+    case $key in
+        --with-env)
+        with_environment=true
+        shift
+        ;;
+    esac
+    done
+
+    if [ "$with_environment" = true ]; then
+        ./environment.sh
+    fi
 
     {% for f,job,rpc,args,default_connectivity,location in files -%}
     {%- if rpc == True and not f.endswith(".hcl") -%}
